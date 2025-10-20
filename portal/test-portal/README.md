@@ -32,6 +32,38 @@ npm install
 ```
 
 The first run will create `data/portal.sqlite` and seed the schema automatically.
+Automation control plane for the TEKS MVP Playwright test suite. The portal lets you:
+
+- catalogue environments (Dev/QA/Prod, staging, etc.) without embedding auth tokens in the portal
+- onboard both traditional `.spec.ts` suites and human-readable MCP scenarios per feature/page
+- trigger runs manually, via the built-in scheduler, or through the MCP client integrations
+- inspect execution history, logs, JSON reports, traces, and screenshot evidence from the dedicated Runs page
+
+All persistence lives under `data/` (SQLite database and run artifacts).
+
+## Prerequisites
+
+| Requirement | Notes |
+|-------------|-------|
+| Node.js 18+ | Required for the API, UI, and MCP server. |
+| npm         | Used to install dependencies and run scripts. |
+| Playwright deps | Ensure `frontend/teks-mvp` has run `npm install` and `npx playwright install` at least once. |
+
+From the repo root, you should have the following structure:
+
+```
+frontend/teks-mvp      # Playwright project that contains the tests to execute
+portal/test-portal     # This portal
+```
+
+## Install
+
+```bash
+cd portal/test-portal
+npm install
+```
+
+The first run will create `data/portal.sqlite` and seed the schema automatically.
 
 ## Running the services
 
@@ -206,8 +238,31 @@ You can still trigger the same case manually via API or MCP; the scheduler will 
 ## Resetting state
 
 To wipe the portal and start clean:
+## Resetting state
+
+To wipe the portal and start clean:
 
 ```bash
+rm -rf data/portal.sqlite data/artifacts
+npm run start:server
+```
+
+This recreates the SQLite database and artifact folders on next launch.
+
+## Troubleshooting
+
+- **Playwright project not found:** ensure the `frontend/teks-mvp` directory exists relative to the repo root and contains the Playwright tests.
+- **Missing browser binaries:** run `cd ../../frontend/teks-mvp && npx playwright install` to install the required browsers.
+- **Authentication secrets:** configure them through `MCP_SECRETS_FILE`, `PLAYWRIGHT_MCP_USERNAME`, and `PLAYWRIGHT_MCP_PASSWORD` rather than embedding tokens in the database.
+
+## Related resources
+
+- `server/index.js` – REST API entry point.
+- `server/mcpServer.js` – MCP stdio server exposing automation tools.
+- `server/runManager.js` – queueing, scheduler, and Playwright invocation.
+- `server/mcpClientRunner.js` – executes YAML scenarios via the Playwright MCP client.
+- `server/storage.js` – SQLite schema + persistence helpers.
+
 rm -rf data/portal.sqlite data/artifacts
 npm run start:server
 ```

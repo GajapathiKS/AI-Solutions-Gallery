@@ -17,6 +17,7 @@ export default function SettingsPage() {
   const submit = (event: FormEvent) => {
     event.preventDefault();
     if (!form.name || !form.baseUrl) return;
+    if (!form.name || !form.baseUrl) return;
     setSaving(true);
     ApiClient.createEnvironment({
       name: form.name,
@@ -24,6 +25,7 @@ export default function SettingsPage() {
       baseUrl: form.baseUrl,
       notes: form.notes || undefined
     }).then(() => {
+      setForm({ name: '', type: form.type, baseUrl: form.baseUrl, notes: '' });
       setForm({ name: '', type: form.type, baseUrl: form.baseUrl, notes: '' });
       environments.refresh();
     }).finally(() => setSaving(false));
@@ -34,6 +36,7 @@ export default function SettingsPage() {
       <section>
         <h2>Add Environment</h2>
         <form onSubmit={submit} className="panel">
+          <label>Name<input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="QA" /></label>
           <label>Name<input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="QA" /></label>
           <label>
             Type
