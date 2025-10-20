@@ -10,18 +10,19 @@ const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${PORT}`;
 export default defineConfig({
   testDir: './tests/e2e',
   use: {
-    baseURL: BASE_URL,
+    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:4200',
     trace: 'on-first-retry',
     screenshot: 'on'
   },
-  // Ensure the Angular dev server starts from the project root regardless of where Playwright is launched
-  webServer: {
-    command: `npm start -- --port ${PORT}`,
-    url: BASE_URL,
-    reuseExistingServer: !process.env.CI,
-    timeout: 180000,
-    stdout: 'pipe',
-    stderr: 'pipe',
-    cwd: path.resolve(__dirname)
-  }
+  webServer: [
+    {
+      command: 'npm start -- --port 4200',
+      url: 'http://localhost:4200',
+      reuseExistingServer: !process.env.CI,
+      timeout: 180000,
+      cwd: '.',
+      stdout: 'pipe',
+      stderr: 'pipe'
+    }
+  ]
 });
