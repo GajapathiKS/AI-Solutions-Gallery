@@ -1,11 +1,16 @@
 #!/usr/bin/env node
-const path = require('node:path');
-const fs = require('node:fs');
-const { hideBin } = require('yargs/helpers');
-const yargs = require('yargs/yargs');
-const chalkLib = require('chalk');
+import path from 'node:path';
+import fs from 'node:fs';
+import { hideBin } from 'yargs/helpers';
+import yargsLib from 'yargs/yargs';
+import chalkLib from 'chalk';
+import { runMcpScenario, schemaPath, loadScenarioFile } from './runner.js';
+import { fileURLToPath } from 'node:url';
+
+const yargs = yargsLib;
 const chalk = chalkLib.default || chalkLib;
-const { runMcpScenario, schemaPath } = require('./runner');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 async function main() {
   const argv = yargs(hideBin(process.argv))
@@ -84,7 +89,7 @@ async function main() {
       const projectRoot = path.resolve(__dirname, '..');
       const repoRoot = path.resolve(projectRoot, '..', '..');
       const backendApiRoot = path.join(repoRoot, 'backend', 'src', 'SpecialPrograms.Api');
-      const { metadata, config } = require('./runner').loadScenarioFile(path.resolve(argv.file), {
+      const { metadata, config } = loadScenarioFile(path.resolve(argv.file), {
         environment: {},
         runtime: {
           runId: Date.now(),

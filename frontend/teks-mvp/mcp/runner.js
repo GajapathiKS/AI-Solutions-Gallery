@@ -1,14 +1,18 @@
-const fs = require('node:fs');
-const path = require('node:path');
-const os = require('node:os');
-const yaml = require('js-yaml');
-const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
-const { StdioClientTransport } = require('@modelcontextprotocol/sdk/client/stdio.js');
-const Ajv = require('ajv');
-const chalkLib = require('chalk');
+import fs from 'node:fs';
+import path from 'node:path';
+import os from 'node:os';
+import yaml from 'js-yaml';
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+import Ajv from 'ajv';
+import chalkLib from 'chalk';
+import { spawn } from 'node:child_process';
+import { setTimeout as delay } from 'node:timers/promises';
+import { fileURLToPath } from 'node:url';
+
 const chalk = chalkLib.default || chalkLib;
-const { spawn } = require('node:child_process');
-const { setTimeout: delay } = require('node:timers/promises');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const schemaPath = path.join(__dirname, 'schema', 'mcp-scenario.schema.json');
 const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
@@ -992,8 +996,4 @@ async function runMcpScenario({
   }
 }
 
-module.exports = {
-  runMcpScenario,
-  loadScenarioFile,
-  schemaPath
-};
+export { runMcpScenario, loadScenarioFile, schemaPath };

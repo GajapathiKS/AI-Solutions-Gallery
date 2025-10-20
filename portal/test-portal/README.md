@@ -159,8 +159,8 @@ MCP scenarios often require API keys (e.g. ChatGPT or GitHub Copilot tokens) as 
 
 1. **Create a secrets file** (dotenv format):
    ```bash
-   mkdir -p ~/.config/playwright-mcp
-   cat <<'ENV' > ~/.config/playwright-mcp/secrets.env
+   mkdir -p ~/.config/playwright_mcp
+   cat <<'ENV' > ~/.config/playwright_mcp/secrets.env
    OPENAI_API_KEY=sk-your-openai-key
    GITHUB_COPILOT_ACCESS_TOKEN=ghu_your_copilot_token
    PLAYWRIGHT_MCP_USERNAME=admin
@@ -170,7 +170,7 @@ MCP scenarios often require API keys (e.g. ChatGPT or GitHub Copilot tokens) as 
 
 2. **Point the portal to the secrets** before starting the server:
    ```bash
-   export MCP_SECRETS_FILE=~/.config/playwright-mcp/secrets.env
+   export MCP_SECRETS_FILE=~/.config/playwright_mcp/secrets.env
    npm run start:server
    ```
 

@@ -2,13 +2,13 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Run Playwright-MCP Test",
+      "label": "Run playwright_mcp Test",
       "type": "shell",
       "command": "python",
       "args": [
-        "tests/playwright-mcp/runner.py",
+        "tests/playwright_mcp/runner.py",
         "--file",
-        "tests/playwright-mcp/plain/sample-login.txt",
+        "tests/playwright_mcp/plain/sample-login.txt",
         "--env",
         "dev",
         "--run-id",
