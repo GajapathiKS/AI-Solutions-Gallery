@@ -20,7 +20,7 @@
           - textbox "Username" [ref=e16]: admin
         - generic [ref=e17]:
           - text: Password
-          - textbox "Password" [ref=e18]: P@ssword1
+          - textbox "Password" [ref=e18]: ChangeMe123!
         - button "Sign In" [ref=e19] [cursor=pointer]
       - paragraph [ref=e20]: Invalid credentials
 ```

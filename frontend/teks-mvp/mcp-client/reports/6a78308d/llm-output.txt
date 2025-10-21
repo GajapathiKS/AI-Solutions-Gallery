@@ -1,0 +1,54 @@
+[
+  {
+    "navigate": "/students/{STUDENT_ID}/needs"
+  },
+  {
+    "waitFor": "url:/students/{STUDENT_ID}/needs$"
+  },
+  {
+    "assertVisible": {
+      "selector": "text=+ New Needs Assessment",
+      "note": "new needs button not visible",
+      "skip": true
+    }
+  },
+  {
+    "click": "text=+ New Needs Assessment"
+  },
+  {
+    "waitFor": "heading:New Needs Assessment"
+  },
+  {
+    "type": {
+      "selector": "label:Academic Needs",
+      "text": "pw_mcpreading_support_<timestamp>"
+    }
+  },
+  {
+    "type": {
+      "selector": "label:Support Services",
+      "text": "pw_mcptutoring_<timestamp>"
+    }
+  },
+  {
+    "type": {
+      "selector": "label:Instructional Strategies",
+      "text": "pw_mcpsmall_group_<timestamp>"
+    }
+  },
+  {
+    "type": {
+      "selector": "label:Assessment Tools",
+      "text": "pw_mcpmap_<timestamp>"
+    }
+  },
+  {
+    "click": "button:Create"
+  },
+  {
+    "waitFor": "text=<timestamp>"
+  },
+  {
+    "screenshot": "name=needs_list_after_create"
+  }
+]

@@ -1,0 +1,23 @@
+[
+  {
+    "navigate": "/students/{STUDENT_ID}/goals"
+  },
+  {
+    "waitFor": "heading:contains('Goals')"
+  },
+  {
+    "waitFor": "text:contains('Description')"
+  },
+  {
+    "assertVisible": "text:contains('Description')"
+  },
+  {
+    "waitFor": "text:contains('No goals yet.')"
+  },
+  {
+    "assertVisible": "text:contains('No goals yet.')"
+  },
+  {
+    "screenshot": "name=goals_page_state"
+  }
+]

@@ -1,0 +1,101 @@
+<!doctype html><meta charset="utf-8"><title>MCP Run</title>
+  <style>
+    body{font-family:system-ui;margin:24px;line-height:1.4}
+    table{border-collapse:collapse;width:100%}
+    td,th{border:1px solid #ddd;padding:8px;vertical-align:top}
+    .ok{color:green;font-weight:600}.fail{color:#b00020;font-weight:600}
+    details{margin:8px 0}
+    code{background:#f7f7f7;padding:2px 4px;border-radius:4px}
+    .meta{margin-bottom:12px}
+    .badge{display:inline-block;padding:2px 8px;border-radius:999px;background:#eee;margin-right:6px}
+    img{max-width:480px;border:1px solid #ddd;border-radius:8px}
+  </style>
+  <h1>MCP Run</h1>
+  <div class="meta">
+    <span class="badge">Base URL: <code>http://localhost:4200</code></span>
+    <span class="badge">Model: <code>amazon.nova-lite-v1:0</code></span>
+    <span class="badge">Region: <code>eu-north-1</code></span>
+    <span class="badge">Totals: <strong>7/7</strong> passed</span>
+  </div>
+  
+  <table>
+    <tr><th>#</th><th>Action</th><th>Status</th><th>Duration (ms)</th><th>Selector/URL</th><th>Error</th><th>Screenshot</th></tr>
+    
+      <tr>
+        <td>1</td>
+        <td>navigate</td>
+        <td class="ok">passed</td>
+        <td>1257</td>
+        <td>/login</td>
+        <td></td>
+        <td><img src="./step_01_after_nav.png" alt="s1"></td>
+      </tr>
+    
+      <tr>
+        <td>2</td>
+        <td>type</td>
+        <td class="ok">passed</td>
+        <td>477</td>
+        <td>input[name='username']</td>
+        <td></td>
+        <td><img src="./step_02_after_type.png" alt="s2"></td>
+      </tr>
+    
+      <tr>
+        <td>3</td>
+        <td>type</td>
+        <td class="ok">passed</td>
+        <td>414</td>
+        <td>input[name='password']</td>
+        <td></td>
+        <td><img src="./step_03_after_type.png" alt="s3"></td>
+      </tr>
+    
+      <tr>
+        <td>4</td>
+        <td>click</td>
+        <td class="ok">passed</td>
+        <td>381</td>
+        <td>button[type='submit']</td>
+        <td></td>
+        <td><img src="./step_04_after_click.png" alt="s4"></td>
+      </tr>
+    
+      <tr>
+        <td>5</td>
+        <td>waitFor</td>
+        <td class="ok">passed</td>
+        <td>453</td>
+        <td>#students-tab</td>
+        <td></td>
+        <td><img src="./step_05_after_wait.png" alt="s5"></td>
+      </tr>
+    
+      <tr>
+        <td>6</td>
+        <td>screenshot</td>
+        <td class="ok">passed</td>
+        <td>376</td>
+        <td></td>
+        <td></td>
+        <td><img src="./step_06_after_login.png" alt="s6"></td>
+      </tr>
+    
+      <tr>
+        <td>7</td>
+        <td>assertVisible</td>
+        <td class="ok">passed</td>
+        <td>459</td>
+        <td>#students-tab</td>
+        <td></td>
+        <td><img src="./step_07_assert_visible.png" alt="s7"></td>
+      </tr>
+    
+  </table>
+  <details><summary>LLM Artifacts</summary>
+    <ul>
+      <li>Request: <code>llm-request.json</code></li>
+      <li>Raw Response: <code>llm-raw-response.json</code></li>
+      <li>Output Text: <code>llm-output.txt</code></li>
+    </ul>
+  </details>

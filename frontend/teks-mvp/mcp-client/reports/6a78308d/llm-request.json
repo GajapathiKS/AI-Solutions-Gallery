@@ -1,0 +1,21 @@
+{
+  "system": [
+    {
+      "text": "You are a test planner for a Playwright MCP client.\nReturn ONLY a raw JSON array (no markdown).\nEach step uses: \"navigate\",\"type\",\"click\",\"waitFor\",\"screenshot\",\"assertVisible\".\nUse relative URLs like \"/login\" (runner will prefix http://localhost:4200)."
+    }
+  ],
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "text": "Goal: Add a new needs assessment for a student and verify it appears in the list.\r\n\r\nNotes:\r\n- Replace {STUDENT_ID} if needed.\r\n- If the \"+ New Needs Assessment\" link is not visible, skip.\r\n\r\nSteps:\r\n- navigate to /students/{STUDENT_ID}/needs\r\n- waitFor a URL that matches /students/{STUDENT_ID}/needs$\r\n- if the link \"+ New Needs Assessment\" is not visible, stop/skip with a note \"new needs button not visible\"\r\n- click the link \"+ New Needs Assessment\"\r\n- waitFor a heading \"New Needs Assessment\"\r\n- type \"pw_mcpreading_support_<timestamp>\" into the field labeled \"Academic Needs\"\r\n- type \"pw_mcptutoring_<timestamp>\" into the field labeled \"Support Services\"\r\n- type \"pw_mcpsmall_group_<timestamp>\" into the field labeled \"Instructional Strategies\"\r\n- type \"pw_mcpmap_<timestamp>\" into the field labeled \"Assessment Tools\"\r\n- click the button \"Create\"\r\n- waitFor any table cell that contains \"<timestamp>\" to be visible\r\n- screenshot name=needs_list_after_create\r\n"
+        }
+      ]
+    }
+  ],
+  "inferenceConfig": {
+    "maxTokens": 900,
+    "temperature": 0.2
+  }
+}

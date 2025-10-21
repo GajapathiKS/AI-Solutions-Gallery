@@ -5,7 +5,7 @@ namespace SpecialPrograms.Api.Services;
 public record SeedUserOptions
 {
     public string Username { get; init; } = "admin";
-    public string Password { get; init; } = "P@ssword1";
+    public string Password { get; init; } = "ChangeMe123!";
 }
 
 public interface IAuthService

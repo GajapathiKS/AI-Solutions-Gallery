@@ -1,0 +1,120 @@
+[
+  {
+    "action": "navigate",
+    "url": "/login",
+    "index": 1,
+    "status": "passed",
+    "durationMs": 1429,
+    "screenshot": "reports\\83ad16dc\\step_01_after_nav.png"
+  },
+  {
+    "action": "type",
+    "selector": "label=Username",
+    "value": "admin",
+    "index": 2,
+    "status": "passed",
+    "durationMs": 458,
+    "screenshot": "reports\\83ad16dc\\step_02_after_type.png"
+  },
+  {
+    "action": "type",
+    "selector": "#username",
+    "value": "admin",
+    "index": 3,
+    "status": "passed",
+    "durationMs": 444,
+    "screenshot": "reports\\83ad16dc\\step_03_after_type.png"
+  },
+  {
+    "action": "type",
+    "selector": "label=Password",
+    "value": "ChangeMe123!",
+    "index": 4,
+    "status": "passed",
+    "durationMs": 398,
+    "screenshot": "reports\\83ad16dc\\step_04_after_type.png"
+  },
+  {
+    "action": "type",
+    "selector": "#password",
+    "value": "ChangeMe123!",
+    "index": 5,
+    "status": "passed",
+    "durationMs": 403,
+    "screenshot": "reports\\83ad16dc\\step_05_after_type.png"
+  },
+  {
+    "action": "click",
+    "selector": "role=button[name=/sign in/i]",
+    "index": 6,
+    "status": "passed",
+    "durationMs": 486,
+    "screenshot": "reports\\83ad16dc\\step_06_after_click.png"
+  },
+  {
+    "action": "click",
+    "selector": "#submit-button",
+    "index": 7,
+    "status": "passed",
+    "durationMs": 430,
+    "screenshot": "reports\\83ad16dc\\step_07_after_click.png"
+  },
+  {
+    "action": "waitFor",
+    "selector": "role=heading[name=/dashboard/i]",
+    "index": 8,
+    "status": "passed",
+    "durationMs": 412,
+    "screenshot": "reports\\83ad16dc\\step_08_after_wait.png"
+  },
+  {
+    "action": "navigate",
+    "url": "/login",
+    "index": 9,
+    "status": "passed",
+    "durationMs": 522,
+    "screenshot": "reports\\83ad16dc\\step_09_after_nav.png"
+  },
+  {
+    "action": "type",
+    "selector": "label=Username",
+    "value": "admin",
+    "index": 10,
+    "status": "passed",
+    "durationMs": 482,
+    "screenshot": "reports\\83ad16dc\\step_10_after_type.png"
+  },
+  {
+    "action": "type",
+    "selector": "label=Password",
+    "value": "ChangeMe123!",
+    "index": 11,
+    "status": "passed",
+    "durationMs": 384,
+    "screenshot": "reports\\83ad16dc\\step_11_after_type.png"
+  },
+  {
+    "action": "click",
+    "selector": "role=button[name=\"Sign In\"]",
+    "index": 12,
+    "status": "passed",
+    "durationMs": 430,
+    "screenshot": "reports\\83ad16dc\\step_12_after_click.png"
+  },
+  {
+    "action": "waitFor",
+    "selector": "text=Dashboard",
+    "index": 13,
+    "status": "passed",
+    "durationMs": 433,
+    "screenshot": "reports\\83ad16dc\\step_13_after_wait.png"
+  },
+  {
+    "action": "screenshot",
+    "name": "after_login",
+    "index": 14,
+    "status": "passed",
+    "durationMs": 412,
+    "screenshot": "reports\\83ad16dc\\step_14_after_login.png"
+  }
+]

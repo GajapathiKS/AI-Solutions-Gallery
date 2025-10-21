@@ -1,0 +1,37 @@
+[
+  {
+    "navigate": "/login"
+  },
+  {
+    "type": {
+      "selector": "input[name='username']",
+      "text": "admin"
+    }
+  },
+  {
+    "type": {
+      "selector": "input[name='password']",
+      "text": "ChangeMe123!"
+    }
+  },
+  {
+    "click": {
+      "selector": "button[type='submit']"
+    }
+  },
+  {
+    "waitFor": {
+      "selector": "Students"
+    }
+  },
+  {
+    "screenshot": {
+      "name": "after_login"
+    }
+  },
+  {
+    "assertVisible": {
+      "selector": "Students"
+    }
+  }
+]

@@ -1,0 +1,30 @@
+[
+  {
+    "action": "navigate",
+    "url": "/students/{STUDENT_ID}/goals"
+  },
+  {
+    "action": "waitFor",
+    "selector": "h1:text('Goals')"
+  },
+  {
+    "action": "waitFor",
+    "selector": "th:text('Description')"
+  },
+  {
+    "action": "assertVisible",
+    "selector": "th:text('Description')"
+  },
+  {
+    "action": "waitFor",
+    "selector": "text('No goals yet.')"
+  },
+  {
+    "action": "assertVisible",
+    "selector": "text('No goals yet.')"
+  },
+  {
+    "action": "screenshot",
+    "name": "goals_page_state"
+  }
+]

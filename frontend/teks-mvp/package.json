@@ -7,7 +7,9 @@
     "test": "ng test",
     "test:e2e": "playwright test -c playwright.config.ts",
     "mcp:run": "node mcp/run-scenario.js",
-    "mcp:convert": "node mcp/convert-spec.js"
+    "mcp:convert": "node mcp/convert-spec.js",
+    "mcp:all": "npm run build && npm run mcp:run:all && npm run mcp:dashboard",
+    "mcp:open": "node -e \"require('child_process').exec(process.platform==='win32' ? 'start reports/index.html' : (process.platform==='darwin' ? 'open reports/index.html' : 'xdg-open reports/index.html'))\""
   },
   "private": true,
   "type": "module",

@@ -1,0 +1,43 @@
+[
+  {
+    "action": "navigate",
+    "url": "/create-goal",
+    "index": 1,
+    "status": "passed",
+    "durationMs": 1258,
+    "screenshot": "reports\\d832b65b\\step_01_after_nav.png"
+  },
+  {
+    "action": "type",
+    "selector": "input[name='goalName']",
+    "value": "Watch 10 shows",
+    "index": 2,
+    "status": "passed",
+    "durationMs": 537,
+    "screenshot": "reports\\d832b65b\\step_02_after_type.png"
+  },
+  {
+    "action": "click",
+    "selector": "button[type='submit']",
+    "index": 3,
+    "status": "passed",
+    "durationMs": 402,
+    "screenshot": "reports\\d832b65b\\step_03_after_click.png"
+  },
+  {
+    "action": "waitFor",
+    "selector": "text/Watch 10 shows",
+    "index": 4,
+    "status": "passed",
+    "durationMs": 423,
+    "screenshot": "reports\\d832b65b\\step_04_after_wait.png"
+  },
+  {
+    "action": "screenshot",
+    "name": "create-goal-and-list-shows",
+    "index": 5,
+    "status": "passed",
+    "durationMs": 404,
+    "screenshot": "reports\\d832b65b\\step_05_create-goal-and-list-shows.png"
+  }
+]

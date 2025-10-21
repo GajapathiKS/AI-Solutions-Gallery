@@ -164,7 +164,7 @@ MCP scenarios often require API keys (e.g. ChatGPT or GitHub Copilot tokens) as 
    OPENAI_API_KEY=sk-your-openai-key
    GITHUB_COPILOT_ACCESS_TOKEN=ghu_your_copilot_token
    PLAYWRIGHT_MCP_USERNAME=admin
-   PLAYWRIGHT_MCP_PASSWORD=P@ssword1
+   PLAYWRIGHT_MCP_PASSWORD=ChangeMe123!
    ENV
    ```
 
@@ -174,7 +174,7 @@ MCP scenarios often require API keys (e.g. ChatGPT or GitHub Copilot tokens) as 
    npm run start:server
    ```
 
-   The MCP client runner also respects `PLAYWRIGHT_MCP_USERNAME` and `PLAYWRIGHT_MCP_PASSWORD` environment variables if you prefer not to create a file. When absent, it falls back to the seeded API credentials (`admin / P@ssword1`).
+   The MCP client runner also respects `PLAYWRIGHT_MCP_USERNAME` and `PLAYWRIGHT_MCP_PASSWORD` environment variables if you prefer not to create a file. When absent, it falls back to the seeded API credentials (`admin / ChangeMe123!`).
 
 3. **Grant the secrets to your MCP client** (ChatGPT, Copilot, Claude, etc.) following their documentation—each token stays outside of the portal database and is read only when invoking MCP scenarios.
 

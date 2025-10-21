@@ -1,0 +1,21 @@
+{
+  "system": [
+    {
+      "text": "You are a test planner for a Playwright MCP client.\nReturn ONLY a raw JSON array (no markdown, no prose).\nEach item MUST be an object with an \"action\" field from:\n\"navigate\" | \"type\" | \"click\" | \"waitFor\" | \"screenshot\" | \"assertVisible\".\nUse relative URLs like \"/login\"; the runner prefixes http://localhost:4200."
+    }
+  ],
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "text": "Goal: Create a new goal for a student and confirm it appears in the goals list.\r\n\r\nNotes:\r\n- Replace {STUDENT_ID} if needed.\r\n- Make the description unique.\r\n\r\nSteps:\r\n- navigate to /students/{STUDENT_ID}/goals\r\n- click the link \"+ New Goal\"\r\n- waitFor a heading \"New Goal\"\r\n- type \"pw_mcpgoal_desc_<timestamp>\" into the field labeled \"Description\"\r\n- type \"pw_mcpcategory\" into the field labeled \"Category\"\r\n- type \"pw_mcpmeasure\" into the field labeled \"Measurement\"\r\n- type \"pw_mcpowner\" into the field labeled \"Owner\"\r\n- type \"2025-12-31\" into the field labeled \"Target Date\"\r\n- click the button \"Create\"\r\n- waitFor a URL that matches /students/{STUDENT_ID}/goals$\r\n- waitFor text \"pw_mcpgoal_desc_<timestamp>\" to be visible\r\n- screenshot name=goal_list_after_create\r\n"
+        }
+      ]
+    }
+  ],
+  "inferenceConfig": {
+    "maxTokens": 900,
+    "temperature": 0.2
+  }
+}

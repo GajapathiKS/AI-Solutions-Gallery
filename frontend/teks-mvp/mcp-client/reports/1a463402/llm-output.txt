@@ -1,0 +1,24 @@
+[
+  {
+    "action": "navigate",
+    "url": "/students/{STUDENT_ID}/goals"
+  },
+  {
+    "action": "waitFor",
+    "selector": "heading:contains('Goals')"
+  },
+  {
+    "action": "assertVisible",
+    "selector": "th:contains('Description')",
+    "condition": "exists"
+  },
+  {
+    "action": "assertVisible",
+    "text": "No goals yet.",
+    "condition": "not exists th:contains('Description')"
+  },
+  {
+    "action": "screenshot",
+    "name": "goals_page_state"
+  }
+]
