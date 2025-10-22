@@ -1,0 +1,26 @@
+Title: Enroll a new student from the Students workspace
+
+Context:
+- Run this scenario with the browser in headed mode so the educator can observe each step.
+- Start from a clean session at http://localhost:4200.
+
+Steps:
+1. Open the Texas TEKS Program Manager login page in a visible browser window.
+2. Sign in with username "admin" and password "P@ssword1".
+3. From the dashboard navigation bar, choose the "Students" link.
+4. Wait until the "Students" heading and the "Add Student" button appear on the page.
+5. In the onboarding form, fill in the student details using easy-to-read values:
+   - Local ID: "auto-ui-" followed by the current timestamp.
+   - First Name: "Alex".
+   - Last Name: "Rivera".
+   - Date of Birth: "2012-02-15".
+   - Grade Level: "5".
+   - Campus: "Central Elementary".
+   - Program Focus: "Reading Support".
+   - Guardian Contact: "guardian@example.com".
+   - Enrollment Date: "2024-08-01".
+   - Next Review Date: "2025-02-01".
+6. Submit the form by choosing the "Add Student" button and keep the browser visible until the table refreshes.
+7. Confirm that a row appears in the "Active Students" table containing the Local ID that was just entered and that the "Open" action is available.
+8. Select the "Open" link for that student and verify that the student detail page shows the student's full name near the top of the page.
+9. Capture a screenshot of the detail page to document the successful onboarding.
