@@ -70,7 +70,7 @@ function asContent(data) {
 
 async function main() {
   const server = new McpServer({
-    name: 'playwright_mcp-server',
+    name: 'playwright-mcp-server',
     version: '0.1.0',
     description: 'Orchestrates Playwright automation against TEKS MVP via MCP tools.'
   }, {

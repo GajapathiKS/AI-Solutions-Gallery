@@ -49,7 +49,7 @@ function loadSecrets() {
     secrets.username = 'admin';
   }
   if (!secrets.password) {
-    secrets.password = 'ChangeMe123!';
+    secrets.password = 'P@ssword1';
   }
   return secrets;
 }

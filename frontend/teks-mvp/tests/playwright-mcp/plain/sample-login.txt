@@ -1,0 +1,6 @@
+Open the login page.
+Type username as admin and password as ChangeMe123!
+Click the Submit button.
+Wait until the Students tab is visible.
+Take a screenshot named after_login.
+Confirm the Students tab is visible.
