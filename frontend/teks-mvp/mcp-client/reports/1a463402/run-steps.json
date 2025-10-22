@@ -1,0 +1,111 @@
+[
+  {
+    "action": "navigate",
+    "url": "/login",
+    "index": 1,
+    "status": "passed",
+    "durationMs": 1379,
+    "screenshot": "reports\\1a463402\\step_01_after_nav.png"
+  },
+  {
+    "action": "type",
+    "selector": "label=Username",
+    "value": "admin",
+    "index": 2,
+    "status": "passed",
+    "durationMs": 509,
+    "screenshot": "reports\\1a463402\\step_02_after_type.png"
+  },
+  {
+    "action": "type",
+    "selector": "#username",
+    "value": "admin",
+    "index": 3,
+    "status": "passed",
+    "durationMs": 403,
+    "screenshot": "reports\\1a463402\\step_03_after_type.png"
+  },
+  {
+    "action": "type",
+    "selector": "label=Password",
+    "value": "ChangeMe123!",
+    "index": 4,
+    "status": "passed",
+    "durationMs": 420,
+    "screenshot": "reports\\1a463402\\step_04_after_type.png"
+  },
+  {
+    "action": "type",
+    "selector": "#password",
+    "value": "ChangeMe123!",
+    "index": 5,
+    "status": "passed",
+    "durationMs": 473,
+    "screenshot": "reports\\1a463402\\step_05_after_type.png"
+  },
+  {
+    "action": "click",
+    "selector": "role=button[name=/sign in/i]",
+    "index": 6,
+    "status": "passed",
+    "durationMs": 494,
+    "screenshot": "reports\\1a463402\\step_06_after_click.png"
+  },
+  {
+    "action": "click",
+    "selector": "#submit-button",
+    "index": 7,
+    "status": "passed",
+    "durationMs": 465,
+    "screenshot": "reports\\1a463402\\step_07_after_click.png"
+  },
+  {
+    "action": "waitFor",
+    "selector": "role=heading[name=/dashboard/i]",
+    "index": 8,
+    "status": "passed",
+    "durationMs": 418,
+    "screenshot": "reports\\1a463402\\step_08_after_wait.png"
+  },
+  {
+    "action": "navigate",
+    "url": "/students/{STUDENT_ID}/goals",
+    "index": 9,
+    "status": "passed",
+    "durationMs": 476,
+    "screenshot": "reports\\1a463402\\step_09_after_nav.png"
+  },
+  {
+    "action": "waitFor",
+    "selector": "heading:contains('Goals')",
+    "index": 10,
+    "status": "passed",
+    "durationMs": 426,
+    "screenshot": "reports\\1a463402\\step_10_after_wait.png"
+  },
+  {
+    "action": "assertVisible",
+    "selector": "th:contains('Description')",
+    "condition": "exists",
+    "index": 11,
+    "status": "passed",
+    "durationMs": 417,
+    "screenshot": "reports\\1a463402\\step_11_assert_visible.png"
+  },
+  {
+    "action": "assertVisible",
+    "selector": "text=No goals yet.",
+    "index": 12,
+    "status": "passed",
+    "durationMs": 396,
+    "screenshot": "reports\\1a463402\\step_12_assert_visible.png"
+  },
+  {
+    "action": "screenshot",
+    "name": "goals_page_state",
+    "index": 13,
+    "status": "passed",
+    "durationMs": 401,
+    "screenshot": "reports\\1a463402\\step_13_goals_page_state.png"
+  }
+]

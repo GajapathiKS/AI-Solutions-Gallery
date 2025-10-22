@@ -1,0 +1,28 @@
+[
+  {
+    "action": "navigate",
+    "url": "/login"
+  },
+  {
+    "action": "type",
+    "selector": "input[label='Username']",
+    "value": "admin"
+  },
+  {
+    "action": "type",
+    "selector": "input[label='Password']",
+    "value": "ChangeMe123!"
+  },
+  {
+    "action": "click",
+    "selector": "button:text('Sign In')"
+  },
+  {
+    "action": "waitFor",
+    "selector": "body"
+  },
+  {
+    "action": "screenshot",
+    "name": "after_login"
+  }
+]

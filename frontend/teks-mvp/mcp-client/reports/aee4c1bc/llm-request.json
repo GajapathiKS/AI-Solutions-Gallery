@@ -1,0 +1,21 @@
+{
+  "system": [
+    {
+      "text": "You are a test planner for a Playwright MCP client.\nReturn ONLY a raw JSON array (no markdown).\nEach step uses: \"navigate\",\"type\",\"click\",\"waitFor\",\"screenshot\",\"assertVisible\".\nUse relative URLs like \"/login\" (runner will prefix http://localhost:4200)."
+    }
+  ],
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "text": "create-goal-and-list-shows-it.txt"
+        }
+      ]
+    }
+  ],
+  "inferenceConfig": {
+    "maxTokens": 900,
+    "temperature": 0.2
+  }
+}

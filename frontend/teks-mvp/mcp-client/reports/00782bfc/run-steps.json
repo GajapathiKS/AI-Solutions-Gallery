@@ -1,0 +1,52 @@
+[
+  {
+    "action": "navigate",
+    "url": "/login",
+    "index": 1,
+    "status": "passed",
+    "durationMs": 1303,
+    "screenshot": "reports\\00782bfc\\step_01_after_nav.png"
+  },
+  {
+    "action": "type",
+    "selector": "input[label='Username']",
+    "value": "admin",
+    "index": 2,
+    "status": "passed",
+    "durationMs": 517,
+    "screenshot": "reports\\00782bfc\\step_02_after_type.png"
+  },
+  {
+    "action": "type",
+    "selector": "input[label='Password']",
+    "value": "P@ssword1",
+    "index": 3,
+    "status": "passed",
+    "durationMs": 452,
+    "screenshot": "reports\\00782bfc\\step_03_after_type.png"
+  },
+  {
+    "action": "click",
+    "selector": "button:text('Sign In')",
+    "index": 4,
+    "status": "passed",
+    "durationMs": 432,
+    "screenshot": "reports\\00782bfc\\step_04_after_click.png"
+  },
+  {
+    "action": "waitFor",
+    "selector": "h1:text('Dashboard')",
+    "index": 5,
+    "status": "passed",
+    "durationMs": 454,
+    "screenshot": "reports\\00782bfc\\step_05_after_wait.png"
+  },
+  {
+    "action": "screenshot",
+    "name": "after_login",
+    "index": 6,
+    "status": "passed",
+    "durationMs": 502,
+    "screenshot": "reports\\00782bfc\\step_06_after_login.png"
+  }
+]

@@ -1,0 +1,21 @@
+{
+  "system": [
+    {
+      "text": "You are a test planner for a Playwright MCP client.\nReturn ONLY a raw JSON array (no markdown).\nEach step uses: \"navigate\",\"type\",\"click\",\"waitFor\",\"screenshot\",\"assertVisible\".\nUse relative URLs like \"/login\" (runner will prefix http://localhost:4200)."
+    }
+  ],
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "text": "Goal: The goals page shows either a table (with Description column) or a friendly empty-state message.\r\n\r\nNotes:\r\n- Replace {STUDENT_ID} if needed.\r\n\r\nSteps:\r\n- navigate to /students/{STUDENT_ID}/goals\r\n- waitFor a heading \"Goals\"\r\n- if the column header \"Description\" is present, assertVisible on it\r\n- otherwise, assertVisible text \"No goals yet.\"\r\n- screenshot name=goals_page_state\r\n"
+        }
+      ]
+    }
+  ],
+  "inferenceConfig": {
+    "maxTokens": 900,
+    "temperature": 0.2
+  }
+}

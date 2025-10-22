@@ -1,0 +1,8 @@
+{
+  "AWS_REGION": "eu-north-1",
+  "BEDROCK_MODEL_ID": "amazon.nova-lite-v1:0",
+  "BASE_URL": "http://localhost:4200",
+  "REPORT_DIR": "reports",
+  "TESTS_DIR": "tests",
+  "AWS_BEARER_TOKEN_BEDROCK": "bedroc...MQ=="
+}

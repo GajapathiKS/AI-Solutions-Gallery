@@ -1,0 +1,57 @@
+[
+  {
+    "action": "navigate",
+    "url": "/students/{STUDENT_ID}/goals"
+  },
+  {
+    "action": "click",
+    "selector": "+ New Goal"
+  },
+  {
+    "action": "waitFor",
+    "selector": "heading",
+    "text": "New Goal"
+  },
+  {
+    "action": "type",
+    "selector": "label:Description",
+    "text": "pw_mcpgoal_desc_<timestamp>"
+  },
+  {
+    "action": "type",
+    "selector": "label:Category",
+    "text": "pw_mcpcategory"
+  },
+  {
+    "action": "type",
+    "selector": "label:Measurement",
+    "text": "pw_mcpmeasure"
+  },
+  {
+    "action": "type",
+    "selector": "label:Owner",
+    "text": "pw_mcpowner"
+  },
+  {
+    "action": "type",
+    "selector": "label:Target Date",
+    "text": "2025-12-31"
+  },
+  {
+    "action": "click",
+    "selector": "button:Create"
+  },
+  {
+    "action": "waitFor",
+    "url": "/students/{STUDENT_ID}/goals$"
+  },
+  {
+    "action": "waitFor",
+    "selector": "text",
+    "text": "pw_mcpgoal_desc_<timestamp>"
+  },
+  {
+    "action": "screenshot",
+    "name": "goal_list_after_create"
+  }
+]

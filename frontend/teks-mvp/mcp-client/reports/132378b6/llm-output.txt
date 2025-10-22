@@ -1,0 +1,28 @@
+[
+  {
+    "action": "navigate",
+    "url": "/login"
+  },
+  {
+    "action": "type",
+    "field": "Username",
+    "text": "admin"
+  },
+  {
+    "action": "type",
+    "field": "Password",
+    "text": "ChangeMe123!"
+  },
+  {
+    "action": "click",
+    "text": "Sign In"
+  },
+  {
+    "action": "waitFor",
+    "text": "Dashboard"
+  },
+  {
+    "action": "screenshot",
+    "name": "after_login"
+  }
+]

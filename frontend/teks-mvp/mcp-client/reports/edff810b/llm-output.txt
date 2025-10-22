@@ -1,0 +1,66 @@
+[
+  {
+    "action": "navigate",
+    "url": "/students/{STUDENT_ID}"
+  },
+  {
+    "action": "click",
+    "selector": "a:text('Assignments')"
+  },
+  {
+    "action": "waitFor",
+    "url": "/students/.+/assignments"
+  },
+  {
+    "action": "click",
+    "selector": "a:text('+ New Assignment')"
+  },
+  {
+    "action": "waitFor",
+    "selector": "h1:text('New Assignment')"
+  },
+  {
+    "action": "type",
+    "selector": "input[label='Title']",
+    "text": "pw_mcpassignment_<timestamp>"
+  },
+  {
+    "action": "type",
+    "selector": "input[label='Description']",
+    "text": "pw_mcpdesc_auto"
+  },
+  {
+    "action": "type",
+    "selector": "input[label='Due Date']",
+    "text": "2025-12-31"
+  },
+  {
+    "action": "type",
+    "selector": "input[label='Assigned To']",
+    "text": "pw_mcpteacher"
+  },
+  {
+    "action": "click",
+    "selector": "button:text('Create')"
+  },
+  {
+    "action": "waitFor",
+    "url": "/students/{STUDENT_ID}/assignments$"
+  },
+  {
+    "action": "waitFor",
+    "selector": "td:text('pw_mcpassignment_<timestamp>')"
+  },
+  {
+    "action": "click",
+    "selector": "td:text('pw_mcpassignment_<timestamp>') + td a:text('Open')"
+  },
+  {
+    "action": "waitFor",
+    "selector": "h1:text('pw_mcpassignment_<timestamp>')"
+  },
+  {
+    "action": "screenshot",
+    "name": "assignment_detail"
+  }
+]

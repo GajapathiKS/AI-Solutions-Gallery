@@ -1,0 +1,3 @@
+Planner failed: Validation failed: Step 2: 'type' requires 'selector'
+--- Raw (truncated) ---
+{"metrics":{"latencyMs":502},"output":{"message":{"content":[{"text":"[\n  {\"action\": \"navigate\", \"url\": \"/login\"},\n  {\"action\": \"type\", \"field\": \"Username\", \"text\": \"admin\"},\n  {\"action\": \"type\", \"field\": \"Password\", \"text\": \"ChangeMe123!\"},\n  {\"action\": \"click\", \"text\": \"Sign In\"},\n  {\"action\": \"waitFor\", \"text\": \"Dashboard\"},\n  {\"action\": \"screenshot\", \"name\": \"after_login\"}\n]"}],"role":"assistant"}},"stopReason":"end_turn","usage":{"inputTokens":160,"outputTokens":101,"serverToolUsage":{},"totalTokens":261}}

@@ -1,0 +1,60 @@
+[
+  {
+    "action": "navigate",
+    "url": "/login",
+    "index": 1,
+    "status": "passed",
+    "durationMs": 1269,
+    "screenshot": "reports\\d6cb04a4\\step_01_after_nav.png"
+  },
+  {
+    "action": "type",
+    "selector": "input[name='username']",
+    "value": "admin",
+    "index": 2,
+    "status": "passed",
+    "durationMs": 526,
+    "screenshot": "reports\\d6cb04a4\\step_02_after_type.png"
+  },
+  {
+    "action": "type",
+    "selector": "input[name='password']",
+    "value": "ChangeMe123!",
+    "index": 3,
+    "status": "passed",
+    "durationMs": 431,
+    "screenshot": "reports\\d6cb04a4\\step_03_after_type.png"
+  },
+  {
+    "action": "click",
+    "selector": "button[type='submit']",
+    "index": 4,
+    "status": "passed",
+    "durationMs": 422,
+    "screenshot": "reports\\d6cb04a4\\step_04_after_click.png"
+  },
+  {
+    "action": "waitFor",
+    "selector": "#students-tab",
+    "index": 5,
+    "status": "passed",
+    "durationMs": 378,
+    "screenshot": "reports\\d6cb04a4\\step_05_after_wait.png"
+  },
+  {
+    "action": "screenshot",
+    "name": "after_login",
+    "index": 6,
+    "status": "passed",
+    "durationMs": 504,
+    "screenshot": "reports\\d6cb04a4\\step_06_after_login.png"
+  },
+  {
+    "action": "assertVisible",
+    "selector": "#students-tab",
+    "index": 7,
+    "status": "passed",
+    "durationMs": 447,
+    "screenshot": "reports\\d6cb04a4\\step_07_assert_visible.png"
+  }
+]
