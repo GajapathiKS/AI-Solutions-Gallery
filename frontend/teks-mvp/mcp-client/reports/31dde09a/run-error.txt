@@ -1,3 +1,0 @@
-Planner failed: Validation failed: Step 5: 'waitFor' requires 'selector'
---- Raw (truncated) ---
-{"metrics":{"latencyMs":486},"output":{"message":{"content":[{"text":"[\n  {\n    \"action\": \"navigate\",\n    \"url\": \"/login\"\n  },\n  {\n    \"action\": \"type\",\n    \"field\": \"Username\",\n    \"text\": \"admin\"\n  },\n  {\n    \"action\": \"type\",\n    \"field\": \"Password\",\n    \"text\": \"ChangeMe123!\"\n  },\n  {\n    \"action\": \"click\",\n    \"text\": \"Sign In\"\n  },\n  {\n    \"action\": \"waitFor\",\n    \"redirect\": true\n  },\n  {\n    \"action\": \"screenshot\",\n    \"name\": \"after_login\"\n  }\n]"}],"role":"assistant"}},"stopReason":"end_turn","usage":{"inputTokens":164,"outputTokens":131,"serverToolUsage":{},"totalTokens":295}}

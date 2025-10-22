@@ -1,2 +1,0 @@
-http://localhost:4200/login
-http://localhost:4200/students/{STUDENT_ID}/goals

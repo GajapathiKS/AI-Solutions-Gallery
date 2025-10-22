@@ -1,0 +1,1 @@
+Login with admin credentials username: admin, password: ChangeMe123! and verify that the dashboard page with Students tab is visible.
