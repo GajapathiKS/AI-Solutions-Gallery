@@ -1,0 +1,26 @@
+{
+  "defaultEnv": "dev",
+  "artifactsDir": "reports",
+  "environments": {
+    "dev": {
+      "baseUrl": "http://localhost:4200",
+      "headless": false,
+      "timeoutMs": 45000
+    },
+    "qa": {
+      "baseUrl": "https://qa.teks.example",
+      "headless": false,
+      "timeoutMs": 50000
+    },
+    "prod": {
+      "baseUrl": "https://app.teks.example",
+      "headless": false,
+      "timeoutMs": 60000
+    }
+  },
+  "mcp": {
+    "mode": "stdio",
+    "stdioCommand": ["node", "mcp/server.js"],
+    "cwd": ".."
+  }
+}

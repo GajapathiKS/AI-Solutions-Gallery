@@ -1,0 +1,3 @@
+Go to the dashboard after signing in.
+Ensure the overview cards render with current counts.
+Capture a screenshot of the dashboard summary.
