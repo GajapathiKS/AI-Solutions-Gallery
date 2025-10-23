@@ -35,5 +35,24 @@ export async function runAgenticTest(
   // 4) Run verifications (if any)
   await executor.verify(plan.verification || []);
 
+  // 5) Capture console messages and network requests for debugging
+  try {
+    const consoleRes = await client.callTool({ name: 'browser_console_messages', arguments: {} });
+    logger.info('Console messages captured', { data: consoleRes });
+    
+    const networkRes = await client.callTool({ name: 'browser_network_requests', arguments: {} });
+    logger.info('Network requests captured', { data: networkRes });
+  } catch (e: any) {
+    logger.warn('Failed to capture debug info', { error: e?.message });
+  }
+
+  // 6) Close browser to prevent "Restore pages" popup on next run
+  try {
+    await client.callTool({ name: 'browser_close', arguments: {} });
+    logger.info('Browser closed successfully');
+  } catch (e: any) {
+    logger.warn('Failed to close browser', { error: e?.message });
+  }
+
   // (Optional) Final observation could be added here
 }

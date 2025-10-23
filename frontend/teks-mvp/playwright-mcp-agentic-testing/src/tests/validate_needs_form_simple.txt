@@ -1,0 +1,15 @@
+You are on the New Needs Assessment form.
+
+Test 1: Check that Create button is disabled with empty form
+
+Test 2: Fill only Academic Needs field with "Test validation" and verify Create button is still disabled
+
+Test 3: Fill all four fields:
+- Academic Needs: "Validation Test - Academic"
+- Support Services: "Validation Test - Services"
+- Instructional Strategies: "Validation Test - Strategies"  
+- Assessment Tools: "Validation Test - Tools"
+
+Verify the Create button becomes enabled.
+
+Test 4: Click Cancel button to return to list without saving.

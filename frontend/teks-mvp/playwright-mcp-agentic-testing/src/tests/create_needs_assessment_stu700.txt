@@ -1,0 +1,47 @@
+Navigate to http://localhost:4200/students to view the students list.
+
+Search for student STU700 (TestStudent Automation) in the table.
+
+Click on STU700 to view student details.
+
+Navigate to the Needs Assessments section.
+
+Click the "+ New Needs Assessment" button.
+
+Fill in the new needs assessment form with these details:
+
+Academic Needs:
+Student demonstrates solid foundational reading skills but requires targeted support for reading fluency and stamina. Can decode most grade-level texts but needs practice with expression and phrasing. Benefits from structured literacy routines and consistent practice opportunities.
+
+Support Services:
+- Supplemental reading support 2x per week
+- Access to high-interest reading materials
+- Reading fluency software program
+- Parent training for home reading practice
+- Book club participation
+
+Instructional Strategies:
+- Repeated reading practice with feedback
+- Reader's theater and poetry performance
+- Think-aloud modeling during read-alouds
+- Goal-setting for reading fluency improvement
+- Choice reading time with conferencing
+- Partnerships with strong reader models
+
+Assessment Tools:
+- WCPM (Words Correct Per Minute) tracking
+- Fluency progress graphs shared with student
+- Informal reading inventories
+- Student self-assessment rubrics
+- Reading logs and reflections
+
+Click the Create button to submit.
+
+Verify that:
+1. Page redirects to the needs assessments list
+2. Success message "Needs assessment added." is displayed
+3. The newly created needs assessment appears in the table
+4. All entered data is correctly displayed
+5. Created date is present
+
+Take a screenshot showing the success and the complete needs assessment list.

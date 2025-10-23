@@ -7,10 +7,11 @@ import type { AgentPlan } from "../core/schema.js";
 const PlanSchema = z.object({
   steps: z.array(z.object({
     type: z.enum([
-      "navigate","type","click","press","selectOption","hover","drag","waitFor","screenshot","resize"
+      "navigate","type","click","press","selectOption","hover","drag","waitFor","screenshot","resize","evaluate"
     ]),
     target: z.string().optional(),
     value: z.string().optional(),
+    code: z.string().optional(), // For evaluate type: JavaScript code to execute
     timeoutMs: z.number().optional()
   })),
   verification: z.array(z.object({
@@ -28,12 +29,31 @@ export class PlannerAgent {
   ) {}
 
   async createPlan(goalText: string, ctx: { baseUrl: string; timeoutMs: number }): Promise<AgentPlan> {
-    const system = `You are an E2E test planner for a Playwright+MCP agent.
+    const system = `You are an E2E test planner for a Playwright+MCP agent testing an Angular application.
 Return JSON with { steps: Step[], verification: VerifyStep[] }.
-- "navigate" value must be a full URL.
-- "type" requires { target, value } where target is a CSS selector or label text.
-- prefer robust selectors like input[name="username"], button[type="submit"].
-- verification must include at least one step, e.g. {type:"visible",target:"#students-tab"} or {type:"text",target:"body",value:"Students"}.`;
+
+IMPORTANT for Angular forms: 
+- The "type" action does NOT trigger Angular form validation or change detection
+- The "click" action does NOT trigger Angular (click) event handlers
+- When filling forms, click each input first, then type into it
+- To submit Angular forms, use "evaluate" step type to call the submit function directly
+
+Available step types:
+- navigate: Navigate to URL (value = full URL)
+- type: Type text into input (target = CSS selector, value = text)
+- click: Click element (target = CSS selector) - NOTE: Does NOT trigger Angular click handlers
+- evaluate: Execute JavaScript code (code = JS to run, e.g., "document.querySelector('button').click()")
+- press: Press keyboard key (target = selector, value = key name)
+- selectOption: Select dropdown option
+- hover, drag, waitFor, screenshot, resize
+
+Best practices for Angular apps:
+1. Use click + type for each form field
+2. Use "evaluate" with code like "document.querySelector('form').submit()" to submit forms
+3. Or use "evaluate" to directly call component methods if needed
+
+- verification must include at least one step, e.g. {type:"visible",target:"#students-tab"}.`;
+
 
     const user = `Goal:\n${goalText}\n\nBase URL: ${ctx.baseUrl}\nDefault timeout: ${ctx.timeoutMs}ms\n`;
 
@@ -41,13 +61,27 @@ Return JSON with { steps: Step[], verification: VerifyStep[] }.
       if (!this.bedrock) throw new Error("Bedrock client not configured");
       const raw = await this.bedrock.generateJSON<any>(system, user);
       
-      // Normalize LLM output: convert "wait" to "waitFor" before validation
+      // Normalize LLM output before validation
       if (raw && Array.isArray(raw.steps)) {
         raw.steps = raw.steps.map((step: any) => {
+          // Convert "wait" to "waitFor"
           if (step.type === "wait") {
-            return { ...step, type: "waitFor" };
+            step = { ...step, type: "waitFor" };
+          }
+          // Ensure value is string (convert numbers to strings)
+          if (step.value !== undefined && typeof step.value !== "string") {
+            step.value = String(step.value);
           }
           return step;
+        });
+      }
+      
+      // Normalize verification steps
+      if (raw && Array.isArray(raw.verification)) {
+        raw.verification = raw.verification.filter((v: any) => {
+          // Remove invalid verification types like "wait"
+          const validTypes = ["text", "visible", "url", "exists", "scroll", "screenshot"];
+          return validTypes.includes(v.type);
         });
       }
       

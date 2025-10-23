@@ -2,11 +2,14 @@
   "mcp": {
     "mode": "stdio",
     "command": "node",
-    "args": ["./node_modules/@playwright/mcp/cli.js"],
+    "args": [
+      "./node_modules/@playwright/mcp/cli.js",
+      "--headless",
+      "--no-sandbox"
+    ],
     "cwd": ".",
     "env": {
-      "PWDEBUG": "0",
-      "HEADLESS": "1"
+      "PWDEBUG": "0"
     }
   },
   "defaultEnv": "dev",
@@ -14,7 +17,7 @@
   "environments": {
     "dev": {
       "baseUrl": "http://localhost:4200",
-      "headless": false,
+      "headless": true,
       "timeoutMs": 45000
     }
   }

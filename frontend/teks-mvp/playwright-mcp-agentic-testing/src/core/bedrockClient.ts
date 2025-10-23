@@ -142,4 +142,64 @@ export class BedrockClient {
       return JSON.parse(m[0]) as T;
     }
   }
+
+  /** Ask model to return plain text (no JSON parsing). */
+  async generateText(systemPrompt: string, userPrompt: string): Promise<string> {
+    // Build legacy text payload (Nova Lite v1 text mode)
+    const textBody = {
+      inputText: `${systemPrompt}\n\nUSER:\n${userPrompt}`,
+      textGenerationConfig: {
+        temperature: 0.2,
+        topP: 0.9,
+        maxTokenCount: 4000,
+      },
+    };
+
+    // Prefer AWS SDK (SigV4) when AWS credentials are valid
+    if (this.useAwsSdk) {
+      const client = new BedrockRuntimeClient({ region: this.region });
+      const cmd = new InvokeModelCommand({
+        modelId: this.modelId,
+        contentType: "application/json",
+        accept: "application/json",
+        body: Buffer.from(JSON.stringify(textBody)),
+      });
+      const res = await client.send(cmd);
+      const text = new TextDecoder().decode(res.body as Uint8Array);
+      const payload = JSON.parse(text) as any;
+      return (
+        payload?.output?.message?.content?.[0]?.text ??
+        payload?.output?.text ??
+        payload?.generated_text ??
+        payload?.content?.[0]?.text ??
+        ""
+      );
+    }
+
+    // Fallback to bearer/x-api-key fetch mode (for bearer tokens / proxies)
+    const converseBody = {
+      system: [{ text: systemPrompt }],
+      messages: [{ role: "user", content: [{ text: userPrompt }] }],
+      inferenceConfig: { temperature: 0.2, maxTokens: 4000 },
+    };
+    const url = `${this.baseUrl.replace(/\/$/, "")}/model/${encodeURIComponent(this.modelId)}/converse`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        ...(this.authHeader === "authorization"
+          ? { "Authorization": `Bearer ${this.token}` }
+          : { "x-api-key": this.token }),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(converseBody),
+    });
+
+    if (!res.ok) {
+      const t = await res.text();
+      throw new Error(`Bedrock error ${res.status}: ${t}`);
+    }
+
+    const payload = await res.json() as any;
+    return payload?.output?.message?.content?.[0]?.text ?? "";
+  }
 }

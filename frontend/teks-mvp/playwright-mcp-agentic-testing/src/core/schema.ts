@@ -9,7 +9,8 @@ export type ActionType =
   | "drag"
   | "waitFor"
   | "screenshot"
-  | "resize";
+  | "resize"
+  | "evaluate";
 
 export interface PlanStep {
   /** One of the supported action types */
@@ -18,6 +19,8 @@ export interface PlanStep {
   target?: string;
   /** Value for typing / url for navigate / file name for screenshot / etc */
   value?: string;
+  /** JavaScript code to execute (for evaluate type) */
+  code?: string;
   /** Optional timeout override for this step */
   timeoutMs?: number;
 }

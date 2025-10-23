@@ -1,0 +1,12 @@
+Create a new student with these details:
+- Local ID: STU700
+- First Name: TestStudent
+- Last Name: Automation
+- Date of Birth: 2015-08-15
+- Grade Level: 4
+- Campus: Lincoln Elementary
+- Program Focus: Reading Support
+- Guardian Contact: parent@test.com
+- Enrollment Date: 2024-08-20
+
+After filling all fields, submit the form.

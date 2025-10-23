@@ -141,9 +141,15 @@ export class ExecutorAgent {
         break;
       case "type":
         if (!step.target) throw new Error("type requires target");
+        // Click first to focus the input (helps with Angular reactive forms)
+        await this.client.callTool({
+          name: "browser_click",
+          arguments: { selector: step.target }
+        }).catch(() => {});
+        // Then type with slowly=true to trigger change events
         await this.client.callTool({
           name: "browser_type",
-          arguments: { selector: step.target, text: step.value ?? "" }
+          arguments: { selector: step.target, text: step.value ?? "", slowly: true }
         });
         break;
       case "click":
@@ -199,6 +205,14 @@ export class ExecutorAgent {
             arguments: { width: w || 1280, height: h || 720 }
           });
         }
+        break;
+      case "evaluate":
+        if (!step.code) throw new Error("evaluate requires code property");
+        this.logger.info("Evaluating JavaScript", { code: step.code });
+        await this.client.callTool({
+          name: "browser_evaluate",
+          arguments: { function: step.code }
+        });
         break;
       default:
         throw new Error(`Unknown step type: ${(step as any).type}`);
