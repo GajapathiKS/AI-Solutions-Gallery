@@ -1,0 +1,26 @@
+{
+  "name": "playwright-mcp-agentic-testing",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "playwright-mcp-agent": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rimraf dist",
+    "start": "node dist/cli.js",
+    "dev": "ts-node-esm src/index.ts"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "dotenv": "^16.4.5",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "rimraf": "^5.0.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}

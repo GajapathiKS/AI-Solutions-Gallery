@@ -1,0 +1,4 @@
+Sign in as an educator.
+Open the Students area and start the add student workflow.
+Fill in the student name, grade, and campus and submit the form.
+Verify the confirmation banner and that the student appears in the roster table.

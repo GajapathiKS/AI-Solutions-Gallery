@@ -1,0 +1,2 @@
+Login with the default administrator account.
+Confirm the dashboard loads and the Students tab is visible.
