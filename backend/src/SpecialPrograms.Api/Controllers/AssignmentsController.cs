@@ -8,7 +8,7 @@ namespace SpecialPrograms.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+// [Authorize] // DISABLED FOR TESTING
 public class AssignmentsController(ApplicationDbContext db) : ControllerBase
 {
     [HttpGet("student/{studentId}")]

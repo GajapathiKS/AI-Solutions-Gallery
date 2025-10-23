@@ -1,6 +1,0 @@
-playwright
-rich
-jinja2
-pydantic
-python-dotenv
-msgspec

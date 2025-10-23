@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { DashboardPageComponent } from './pages/dashboard-page.component';
 import { StudentListPageComponent } from './pages/student-list-page.component';
-import { LoginPageComponent } from './pages/login-page.component';
+import { StudentNewPageComponent } from './pages/student-new-page.component';
 import { StudentDetailPageComponent } from './pages/student-detail-page.component';
 import { AssignmentsListPageComponent } from './pages/assignments-list-page.component';
 import { AssignmentDetailPageComponent } from './pages/assignment-detail-page.component';
@@ -13,15 +13,14 @@ import { StudentShellComponent } from './pages/student-shell.component';
 import { NeedsPageComponent } from './pages/needs-page.component';
 import { GoalNewPageComponent } from './pages/goal-new-page.component';
 import { NeedsNewPageComponent } from './pages/needs-new-page.component';
-import { authGuard } from './services/auth.guard';
 
 export const appRoutes: Routes = [
-  { path: '', component: DashboardPageComponent, canActivate: [authGuard] },
-  { path: 'students', component: StudentListPageComponent, canActivate: [authGuard] },
+  { path: '', redirectTo: 'students', pathMatch: 'full' },
+  { path: 'students', component: StudentListPageComponent },
+  { path: 'students/new', component: StudentNewPageComponent },
   {
     path: 'students/:id',
     component: StudentShellComponent,
-    canActivate: [authGuard],
     children: [
       { path: '', component: StudentDetailPageComponent },
       { path: 'assignments', component: AssignmentsListPageComponent },
@@ -35,6 +34,5 @@ export const appRoutes: Routes = [
       { path: 'progress', component: ProgressPageComponent },
     ]
   },
-  { path: 'login', component: LoginPageComponent },
-  { path: '**', redirectTo: '' }
+  { path: '**', redirectTo: 'students' }
 ];

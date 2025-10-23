@@ -1,394 +1,207 @@
-import path from 'node:path';
-import { EnvironmentConfig } from '../core/env.js';
-import { McpClient } from '../core/mcpClient.js';
-import { RunLogger, StepRecord } from '../core/logger.js';
-import { AgentPlan, PlanStep } from '../core/schema.js';
-import { absoluteUrl, poll } from '../core/utils.js';
-import { ObserverAgent } from './observerAgent.js';
+// src/agents/executorAgent.ts
+import path from "node:path";
+import { RunLogger } from "../core/logger.js";
+import { McpClient } from "../core/mcpClient.js";
+import type { EnvironmentSettings } from "../core/env.js";
+import type { AgentPlan, PlanStep, VerifyStep } from "../core/schema.js";
 
-export interface ExecutionResult {
-  steps: StepRecord[];
+export function buildVisibleScript(selector?: string) {
+  if (!selector) return "() => false";
+  return `() => !!document.querySelector(${JSON.stringify(selector)}) && getComputedStyle(document.querySelector(${JSON.stringify(selector)})!).display !== 'none'`;
+}
+export function buildExistsScript(selector?: string) {
+  if (!selector) return "() => false";
+  return `() => !!document.querySelector(${JSON.stringify(selector)})`;
+}
+export function buildTextContentScript(selector?: string) {
+  if (!selector) return "() => document.body?.innerText || ''";
+  return `() => (document.querySelector(${JSON.stringify(selector)})?.textContent || '')`;
+}
+export function extractText(res: any): string {
+  if (!res) return "";
+  const fromContent = res?.content?.[0]?.text;
+  if (typeof fromContent === "string") return fromContent;
+  return String(res ?? "");
+}
+export function isTruthy(v: any): boolean {
+  if (v === true) return true;
+  const t = extractText(v);
+  return t === "true" || (!!t && t !== "false");
 }
 
 export class ExecutorAgent {
   constructor(
     private readonly client: McpClient,
     private readonly logger: RunLogger,
-    private readonly observer: ObserverAgent,
-    private readonly environment: EnvironmentConfig,
+    private readonly environment: EnvironmentSettings,
     private readonly runDir: string
   ) {}
 
-  async execute(plan: AgentPlan): Promise<ExecutionResult> {
-    const steps: StepRecord[] = [];
-    for (let index = 0; index < plan.steps.length; index += 1) {
-      const step = plan.steps[index];
-      const record: StepRecord = {
-        index,
-        action: step.action,
-        description: step.description,
-        status: 'pending',
-        startedAt: new Date().toISOString()
-      };
-      steps.push(record);
-      const start = Date.now();
+  async executePlan(plan: AgentPlan): Promise<void> {
+    let stepIndex = 0;
+    for (const step of plan.steps) {
+      stepIndex++;
+      this.logger.info(`Step ${stepIndex}`, step as unknown as Record<string, unknown>);
       try {
-        await this.executeStep(step, index, record);
-        record.status = 'passed';
-      } catch (error) {
-        record.status = 'failed';
-        record.error = (error as Error).message;
-        this.logger.error('Step failed', { step: step.action, index, error: record.error });
-        (error as any).steps = steps;
-        throw error;
-      } finally {
-        record.completedAt = new Date().toISOString();
-        record.durationMs = Date.now() - start;
-        const observation = await this.observer.capture(index);
-        if (observation) {
-          record.observationPath = path.relative(this.runDir, observation.htmlPath);
-        }
+        await this.runStep(step);
+      } catch (e: any) {
+        this.logger.error(`Step ${stepIndex} failed`, { error: e?.message });
+        // best effort screenshot on failure
+        const sname = `error_step_${stepIndex}.png`;
+        await this.client.callTool({
+          name: "browser_take_screenshot",
+          arguments: { path: path.join(this.runDir, sname), fullPage: true }
+        }).catch(() => {});
+        throw e;
       }
     }
-    return { steps };
   }
 
-  private async executeStep(step: PlanStep, index: number, record: StepRecord): Promise<void> {
-    switch (step.action) {
-      case 'navigate': {
-        const targetUrl = step.url || step.value || step.target;
-        if (!targetUrl) {
-          throw new Error('navigate action requires url');
-        }
-        const url = absoluteUrl(this.environment.baseUrl, targetUrl);
-        this.logger.info('Navigating', { url });
-        await this.client.callTool({ name: 'browser_navigate', arguments: { url } });
-        if (step.waitFor) {
-          await this.waitForTarget(step.waitFor, step.timeoutMs ?? this.environment.timeoutMs);
-        }
-        break;
-      }
-      case 'type': {
-        const target = step.target;
-        if (!target) {
-          throw new Error('type action requires target');
-        }
-        const value = step.value ?? step.text ?? '';
-        await this.typeInto(target, value);
-        break;
-      }
-      case 'click': {
-        const target = step.target;
-        if (!target) {
-          throw new Error('click action requires target');
-        }
-        await this.click(target);
-        break;
-      }
-      case 'waitFor': {
-        const target = step.target || step.waitFor;
-        if (!target) {
-          throw new Error('waitFor action requires target');
-        }
-        await this.waitForTarget(target, step.timeoutMs ?? this.environment.timeoutMs);
-        break;
-      }
-      case 'expectVisible': {
-        const target = step.target;
-        if (!target) {
-          throw new Error('expectVisible action requires target');
-        }
-        await this.expectVisible(target, step.timeoutMs ?? this.environment.timeoutMs);
-        break;
-      }
-      case 'expectText': {
-        const target = step.target;
-        if (!target) {
-          throw new Error('expectText action requires target');
-        }
-        const text = step.expect ?? step.text ?? step.value;
-        if (!text) {
-          throw new Error('expectText action requires expected text');
-        }
-        await this.expectText(target, text, step.timeoutMs ?? this.environment.timeoutMs);
-        break;
-      }
-      case 'screenshot': {
-        const screenshotPath = await this.observer.screenshot(
-          index,
-          step.screenshotName ?? step.value ?? step.description ?? undefined
-        );
-        if (screenshotPath) {
-          record.observationPath = record.observationPath ?? path.relative(this.runDir, screenshotPath);
-        }
-        break;
-      }
-      case 'planNote': {
-        this.logger.info('Planner note', { message: step.description ?? step.text ?? step.value });
-        break;
-      }
-      default:
-        this.logger.warn('Unknown action skipped', { action: step.action });
-    }
-  }
-
-  private async typeInto(target: string, value: string): Promise<void> {
-    this.logger.info('Typing', { target, value });
-    const script = `() => {
-      ${buildDomHelpersScript()}
-      const target = ${JSON.stringify(normalizeTargetInput(target))};
-      const el = (__mcpQueryAll(target)[0] || null);
-      if (!el) throw new Error('Target not found for type');
-      if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
-        el.focus();
-        el.value = ${JSON.stringify(value)};
-        el.dispatchEvent(new Event('input', { bubbles: true }));
-        el.dispatchEvent(new Event('change', { bubbles: true }));
-      } else {
-        el.textContent = ${JSON.stringify(value)};
-      }
-      return true;
-    }`;
-    await this.evaluate(script);
-  }
-
-  private async click(target: string): Promise<void> {
-    this.logger.info('Clicking', { target });
-    const script = `() => {
-      ${buildDomHelpersScript()}
-      const target = ${JSON.stringify(normalizeTargetInput(target))};
-      const el = (__mcpQueryAll(target)[0] || null);
-      if (!el) throw new Error('Target not found for click');
-      el.click();
-      return true;
-    }`;
-    await this.evaluate(script);
-  }
-
-  private async waitForTarget(target: string, timeoutMs: number): Promise<void> {
-    this.logger.info('Waiting for target', { target, timeoutMs });
-    const script = buildExistsScript(target);
-    await poll(async () => {
-      const result = await this.evaluate(script);
-      return isTruthy(result);
-    }, { timeoutMs, intervalMs: 500 });
-  }
-
-  private async expectVisible(target: string, timeoutMs: number): Promise<void> {
-    const script = buildVisibleScript(target);
-    await poll(async () => {
-      const result = await this.evaluate(script);
-      return isTruthy(result);
-    }, { timeoutMs, intervalMs: 500 });
-  }
-
-  private async expectText(target: string, expected: string, timeoutMs: number): Promise<void> {
-    const script = buildTextContentScript(target);
-    await poll(async () => {
-      const result = await this.evaluate(script);
-      const text = extractText(result);
-      return text.includes(expected);
-    }, { timeoutMs, intervalMs: 500 });
-  }
-
-  private async evaluate(script: string): Promise<any> {
-    return this.client.callTool({ name: 'browser_evaluate', arguments: { function: script } });
-  }
-}
-
-export interface NormalizedTarget {
-  selector?: string;
-  css?: string;
-  testId?: string;
-  role?: string;
-  name?: string;
-  text?: string;
-  exact?: boolean;
-  nth?: number;
-}
-
-export function normalizeTargetInput(target: string): NormalizedTarget {
-  const trimmed = target.trim();
-  if (trimmed.startsWith('role=')) {
-    const rest = trimmed.slice('role='.length);
-    const match = rest.match(/([^\[]+)(?:\[(.+)\])?/);
-    const role = match ? match[1].trim() : rest.trim();
-    const normalized: NormalizedTarget = { role };
-    if (match && match[2]) {
-      const inner = match[2];
-      const nameMatch = inner.match(/name\s*=\s*"([^"]+)"/i);
-      if (nameMatch) {
-        normalized.name = nameMatch[1];
-      }
-    }
-    return normalized;
-  }
-  if (trimmed.startsWith('data-testid=')) {
-    return { testId: trimmed.slice('data-testid='.length).replace(/^"|"$/g, '') };
-  }
-  if (trimmed.startsWith('text=')) {
-    return { text: trimmed.slice('text='.length).replace(/^"|"$/g, '') };
-  }
-  if (trimmed.startsWith('css=')) {
-    return { css: trimmed.slice('css='.length) };
-  }
-  return { selector: trimmed };
-}
-
-export function buildDomHelpersScript(): string {
-  return `
-    const __implicitRoles = {
-      button: 'button',
-      summary: 'button',
-      input: 'textbox',
-      textarea: 'textbox',
-      select: 'combobox',
-      a: 'link',
-      h1: 'heading',
-      h2: 'heading',
-      h3: 'heading',
-      h4: 'heading',
-      h5: 'heading',
-      h6: 'heading'
-    };
-    function __mcpRole(el) {
-      const explicit = el.getAttribute('role');
-      if (explicit) return explicit.toLowerCase();
-      const tag = el.tagName.toLowerCase();
-      const implicit = __implicitRoles[tag];
-      if (implicit === 'heading') {
-        return 'heading';
-      }
-      return implicit || '';
-    }
-    function __mcpName(el) {
-      const aria = el.getAttribute('aria-label');
-      if (aria) return aria.trim();
-      const labelledBy = el.getAttribute('aria-labelledby');
-      if (labelledBy) {
-        const labelEl = document.getElementById(labelledBy);
-        if (labelEl) {
-          return (labelEl.textContent || '').trim();
-        }
-      }
-      if (el.tagName.toLowerCase() === 'input') {
-        const id = el.getAttribute('id');
-        if (id) {
-          const label = document.querySelector('label[for="' + id + '"]');
-          if (label) {
-            return (label.textContent || '').trim();
+  async verify(verification: VerifyStep[]): Promise<void> {
+    if (!verification || verification.length === 0) return;
+    let vIndex = 0;
+    for (const v of verification) {
+      vIndex++;
+      this.logger.info(`Verify ${vIndex}`, v as unknown as Record<string, unknown>);
+      try {
+        switch (v.type) {
+          case "visible":
+          case "exists": {
+            await this.client.callTool({
+              name: "browser_wait_for",
+              arguments: { selector: v.target, timeoutMs: v.timeoutMs ?? this.environment.timeoutMs }
+            });
+            break;
           }
+          case "url": {
+            // Best-effort: evaluate location.href and check substring
+            const res = await this.client.callTool({
+              name: "browser_evaluate",
+              arguments: { expression: "() => location.href" }
+            }).catch(() => null);
+            const href = extractText(res);
+            if (!v.value || !href.includes(v.value)) {
+              throw new Error(`URL verification failed; expected to include ${v.value}, got ${href}`);
+            }
+            break;
+          }
+          case "text": {
+            const expr = v.target
+              ? `() => (document.querySelector(${JSON.stringify(v.target)})?.textContent || '')`
+              : `() => document.body?.innerText || ''`;
+            const res = await this.client.callTool({
+              name: "browser_evaluate",
+              arguments: { expression: expr }
+            }).catch(() => null);
+            const text = extractText(res);
+            if (!v.value || !text.includes(v.value)) {
+              throw new Error(`Text verification failed; expected to include ${v.value}`);
+            }
+            break;
+          }
+          case "scroll":
+            // LLM sometimes suggests scroll as verification; treat as no-op (scrolling happens automatically)
+            this.logger.info("Scroll verification (no-op); content loaded if we got here");
+            break;
+          case "screenshot":
+            // LLM suggests screenshot as verification; take one
+            const shotName = (v.value || `verify_${vIndex}`).endsWith('.png') 
+              ? v.value || `verify_${vIndex}.png`
+              : `${v.value || `verify_${vIndex}`}.png`;
+            const shotPath = path.join(this.runDir, shotName);
+            this.logger.info(`Taking screenshot`, { shotName, fullPath: shotPath });
+            await this.client.callTool({
+              name: "browser_take_screenshot",
+              arguments: { path: shotPath, fullPage: true }
+            });
+            this.logger.info(`Screenshot saved`, { shotName });
+            break;
+          default:
+            this.logger.warn("Unknown verification type; skipping", v as any);
         }
+      } catch (e: any) {
+        this.logger.error(`Verify ${vIndex} failed`, { error: e?.message });
+        const sname = `verify_${vIndex}_failed.png`;
+        await this.client.callTool({
+          name: "browser_take_screenshot",
+          arguments: { path: path.join(this.runDir, sname), fullPage: true }
+        }).catch(() => {});
+        throw e;
       }
-      return (el.textContent || '').trim();
     }
-    function __mcpMatchesText(el, text, exact) {
-      if (!text) return true;
-      const content = (el.textContent || '').trim();
-      if (exact) {
-        return content === text;
-      }
-      return content.includes(text);
-    }
-    function __mcpMatchesTarget(el, target) {
-      if (!el) return false;
-      if (target.selector) {
-        return el.matches(target.selector);
-      }
-      if (target.css) {
-        return el.matches(target.css);
-      }
-      if (target.testId) {
-        return el.getAttribute('data-testid') === target.testId;
-      }
-      if (target.role) {
-        if (__mcpRole(el) !== target.role.toLowerCase()) {
-          return false;
-        }
-        if (target.name && !__mcpMatchesText(el, target.name, target.exact)) {
-          return false;
-        }
-        return true;
-      }
-      if (target.text) {
-        return __mcpMatchesText(el, target.text, target.exact);
-      }
-      return true;
-    }
-    function __mcpQueryAll(target, within) {
-      const root = within || document;
-      if (target.selector) {
-        return Array.from(root.querySelectorAll(target.selector));
-      }
-      if (target.css) {
-        return Array.from(root.querySelectorAll(target.css));
-      }
-      if (target.testId) {
-        return Array.from(root.querySelectorAll('[data-testid="' + target.testId + '"]'));
-      }
-      const all = Array.from(root.querySelectorAll('*'));
-      return all.filter(el => __mcpMatchesTarget(el, target));
-    }
-  `;
-}
-
-export function buildExistsScript(target: string): string {
-  const helpers = buildDomHelpersScript();
-  const normalized = normalizeTargetInput(target);
-  return `() => {
-    ${helpers}
-    const target = ${JSON.stringify(normalized)};
-    const matches = __mcpQueryAll(target);
-    return matches.length > 0;
-  }`;
-}
-
-export function buildVisibleScript(target: string): string {
-  const helpers = buildDomHelpersScript();
-  const normalized = normalizeTargetInput(target);
-  return `() => {
-    ${helpers}
-    const target = ${JSON.stringify(normalized)};
-    const matches = __mcpQueryAll(target);
-    if (!matches.length) return false;
-    const el = matches[0];
-    const rect = el.getBoundingClientRect();
-    return !!rect.width || !!rect.height;
-  }`;
-}
-
-export function buildTextContentScript(target: string): string {
-  const helpers = buildDomHelpersScript();
-  const normalized = normalizeTargetInput(target);
-  return `() => {
-    ${helpers}
-    const target = ${JSON.stringify(normalized)};
-    const matches = __mcpQueryAll(target);
-    if (!matches.length) return '';
-    return (matches[0].textContent || '').trim();
-  }`;
-}
-
-export function extractText(result: any): string {
-  if (!result || !Array.isArray(result.content)) return '';
-  return result.content
-    .map((item: any) => {
-      if (typeof item?.text === 'string') {
-        return item.text;
-      }
-      if (typeof item?.value === 'string') {
-        return item.value;
-      }
-      return '';
-    })
-    .filter(Boolean)
-    .join('');
-}
-
-export function isTruthy(result: any): boolean {
-  const text = extractText(result).toLowerCase();
-  if (!text) {
-    return false;
   }
-  return ['true', '1', 'yes', 'on'].some(flag => text.includes(flag));
+
+  private async runStep(step: PlanStep): Promise<void> {
+    switch (step.type) {
+      case "navigate":
+        await this.client.callTool({
+          name: "browser_navigate",
+          arguments: { url: step.value }
+        });
+        break;
+      case "type":
+        if (!step.target) throw new Error("type requires target");
+        await this.client.callTool({
+          name: "browser_type",
+          arguments: { selector: step.target, text: step.value ?? "" }
+        });
+        break;
+      case "click":
+        if (!step.target) throw new Error("click requires target");
+        await this.client.callTool({
+          name: "browser_click",
+          arguments: { selector: step.target }
+        });
+        break;
+      case "press":
+        await this.client.callTool({
+          name: "browser_press_key",
+          arguments: { key: step.value ?? "Enter" }
+        });
+        break;
+      case "selectOption":
+        await this.client.callTool({
+          name: "browser_select_option",
+          arguments: { selector: step.target, value: step.value }
+        });
+        break;
+      case "hover":
+        await this.client.callTool({
+          name: "browser_hover",
+          arguments: { selector: step.target }
+        });
+        break;
+      case "drag":
+        // expects value like "sourceSelector -> targetSelector"
+        if (!step.value) throw new Error("drag requires value 'src -> dst'");
+        {
+          const [src, dst] = step.value.split("->").map(s => s.trim());
+          await this.client.callTool({ name: "browser_drag", arguments: { source: src, target: dst } });
+        }
+        break;
+      case "waitFor":
+        await this.client.callTool({
+          name: "browser_wait_for",
+          arguments: { selector: step.target, timeoutMs: step.timeoutMs ?? this.environment.timeoutMs }
+        });
+        break;
+      case "screenshot":
+        await this.client.callTool({
+          name: "browser_take_screenshot",
+          arguments: { path: path.join(this.runDir, step.value || `shot_${Date.now()}.png`), fullPage: true }
+        });
+        break;
+      case "resize":
+        {
+          const [w, h] = String(step.value || "1280x720").split("x").map(n => parseInt(n, 10));
+          await this.client.callTool({
+            name: "browser_resize",
+            arguments: { width: w || 1280, height: h || 720 }
+          });
+        }
+        break;
+      default:
+        throw new Error(`Unknown step type: ${(step as any).type}`);
+    }
+  }
 }

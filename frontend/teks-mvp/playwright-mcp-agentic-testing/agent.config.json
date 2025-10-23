@@ -1,0 +1,21 @@
+{
+  "mcp": {
+    "mode": "stdio",
+    "command": "node",
+    "args": ["./node_modules/@playwright/mcp/cli.js"],
+    "cwd": ".",
+    "env": {
+      "PWDEBUG": "0",
+      "HEADLESS": "1"
+    }
+  },
+  "defaultEnv": "dev",
+  "artifactsDir": "reports",
+  "environments": {
+    "dev": {
+      "baseUrl": "http://localhost:4200",
+      "headless": false,
+      "timeoutMs": 45000
+    }
+  }
+}

@@ -1,4 +1,5 @@
-import { EnvironmentConfig } from '../core/env.js';
+// src/agents/verifierAgent.ts
+import { EnvironmentSettings } from '../core/env.js';
 import { McpClient } from '../core/mcpClient.js';
 import { RunLogger } from '../core/logger.js';
 import { AgentPlan } from '../core/schema.js';
@@ -14,7 +15,7 @@ export class VerifierAgent {
   constructor(
     private readonly client: McpClient,
     private readonly logger: RunLogger,
-    private readonly environment: EnvironmentConfig
+    private readonly environment: EnvironmentSettings
   ) {}
 
   async verify(plan: AgentPlan): Promise<VerificationResult> {
@@ -25,7 +26,7 @@ export class VerifierAgent {
     try {
       for (const verifyStep of plan.verification) {
         const timeout = verifyStep.timeoutMs ?? this.environment.timeoutMs;
-        this.logger.info('Verifying outcome', { type: verifyStep.type, target: verifyStep.target, value: verifyStep.value });
+        this.logger.info('Verifying outcome', verifyStep as unknown as Record<string, unknown>);
         if (verifyStep.type === 'visible') {
           await poll(async () => {
             const result = await this.client.callTool({

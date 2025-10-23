@@ -1,64 +1,19 @@
 import { AsyncPipe, DatePipe, NgFor, NgIf } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProgramService } from '../services/program.service';
 import { StudentSummary } from '../models/student';
 
 @Component({
   standalone: true,
   selector: 'app-student-list-page',
-  imports: [NgFor, NgIf, AsyncPipe, RouterLink, ReactiveFormsModule, DatePipe],
+  imports: [NgFor, NgIf, AsyncPipe, RouterLink, DatePipe],
   template: `
     <div class="card">
       <div style="display:flex; align-items:center; justify-content: space-between;">
         <h2 data-testid="students-heading">Students</h2>
-        <button data-testid="add-student" class="btn primary" type="submit" form="onboardForm" [disabled]="form.invalid || form.pending">Add Student</button>
+        <a class="btn primary" routerLink="/students/new" data-testid="add-student-btn">+ Add Student</a>
       </div>
-      <form id="onboardForm" [formGroup]="form" (ngSubmit)="submit()" class="form-grid" style="margin-top:.75rem;">
-        <div class="form-grid">
-          <label>
-            Local ID
-            <input formControlName="localId" />
-          </label>
-          <label>
-            First Name
-            <input formControlName="firstName" />
-          </label>
-          <label>
-            Last Name
-            <input formControlName="lastName" />
-          </label>
-          <label>
-            Date of Birth
-            <input type="date" formControlName="dateOfBirth" />
-          </label>
-          <label>
-            Grade Level
-            <input formControlName="gradeLevel" />
-          </label>
-          <label>
-            Campus
-            <input formControlName="campus" />
-          </label>
-          <label>
-            Program Focus
-            <input formControlName="programFocus" placeholder="Bilingual Support" />
-          </label>
-          <label>
-            Guardian Contact
-            <input formControlName="guardianContact" placeholder="parent@domain" />
-          </label>
-          <label>
-            Enrollment Date
-            <input type="date" formControlName="enrollmentDate" />
-          </label>
-          <label>
-            Next Review Date
-            <input type="date" formControlName="nextReviewDate" />
-          </label>
-        </div>
-      </form>
     </div>
 
     <div class="card">
@@ -100,50 +55,6 @@ import { StudentSummary } from '../models/student';
   styles: []
 })
 export class StudentListPageComponent {
-  private fb = inject(FormBuilder);
   private api = inject(ProgramService);
-
   students = this.api.getStudents();
-
-  form = this.fb.nonNullable.group({
-    localId: ['', Validators.required],
-    firstName: ['', Validators.required],
-    lastName: ['', Validators.required],
-    dateOfBirth: ['', Validators.required],
-    gradeLevel: ['', Validators.required],
-    campus: ['', Validators.required],
-    guardianContact: ['', Validators.required],
-    programFocus: [''],
-    enrollmentDate: [new Date().toISOString().slice(0, 10), Validators.required],
-    nextReviewDate: ['']
-  });
-
-  submit() {
-    if (this.form.invalid) {
-      return;
-    }
-    const payload = {
-      ...this.form.getRawValue(),
-      nextReviewDate: this.form.value.nextReviewDate || null
-    };
-    this.api.createStudent({
-      ...payload,
-      dateOfBirth: payload.dateOfBirth,
-      enrollmentDate: payload.enrollmentDate
-    }).subscribe(() => {
-      this.form.reset({
-        localId: '',
-        firstName: '',
-        lastName: '',
-        dateOfBirth: '',
-        gradeLevel: '',
-        campus: '',
-        guardianContact: '',
-        programFocus: '',
-        enrollmentDate: new Date().toISOString().slice(0, 10),
-        nextReviewDate: ''
-      });
-      this.students = this.api.getStudents();
-    });
-  }
 }

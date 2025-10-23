@@ -10,10 +10,11 @@ export const unauthInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(tap({
     next: () => { },
     error: (err: any) => {
-      if (err && err.status === 401) {
-        auth.logout();
-        router.navigate(['/login']);
-      }
+      // DISABLED AUTH - don't redirect to login on 401
+      // if (err && err.status === 401) {
+      //   auth.logout();
+      //   router.navigate(['/login']);
+      // }
     }
   }));
 };

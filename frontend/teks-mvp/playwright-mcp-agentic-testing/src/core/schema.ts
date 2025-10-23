@@ -1,56 +1,38 @@
-import { z } from 'zod';
+// src/core/schema.ts
+export type ActionType =
+  | "navigate"
+  | "type"
+  | "click"
+  | "press"
+  | "selectOption"
+  | "hover"
+  | "drag"
+  | "waitFor"
+  | "screenshot"
+  | "resize";
 
-export const StepActionSchema = z.enum([
-  'navigate',
-  'type',
-  'click',
-  'waitFor',
-  'expectText',
-  'expectVisible',
-  'screenshot',
-  'planNote'
-]);
+export interface PlanStep {
+  /** One of the supported action types */
+  type: ActionType;
+  /** CSS/XPath/text; interpreted by executor per tool */
+  target?: string;
+  /** Value for typing / url for navigate / file name for screenshot / etc */
+  value?: string;
+  /** Optional timeout override for this step */
+  timeoutMs?: number;
+}
 
-export const PlanStepSchema = z.object({
-  action: StepActionSchema,
-  description: z.string().optional(),
-  url: z.string().optional(),
-  target: z.string().optional(),
-  value: z.string().optional(),
-  text: z.string().optional(),
-  expect: z.string().optional(),
-  waitFor: z.string().optional(),
-  timeoutMs: z.number().int().positive().optional(),
-  screenshotName: z.string().optional()
-});
+export type VerifyType = "text" | "visible" | "url" | "exists" | "scroll" | "screenshot";
 
-export const VerificationSchema = z.object({
-  type: z.enum(['text', 'visible', 'url']),
-  target: z.string(),
-  value: z.string().optional(),
-  timeoutMs: z.number().int().positive().optional()
-});
-
-export const PlanSchema = z.object({
-  plan: z.array(PlanStepSchema),
-  verification: z.array(VerificationSchema).optional(),
-  notes: z.string().optional()
-});
-
-export type PlanStep = z.infer<typeof PlanStepSchema>;
-export type Verification = z.infer<typeof VerificationSchema>;
-export type PlanPayload = z.infer<typeof PlanSchema>;
+export interface VerifyStep {
+  type: VerifyType;
+  target?: string; // selector or "document" for url
+  value?: string;  // expected text or substring of URL
+  timeoutMs?: number;
+}
 
 export interface AgentPlan {
   steps: PlanStep[];
-  verification: Verification[];
-  notes?: string;
-}
-
-export function normalisePlan(payload: PlanPayload): AgentPlan {
-  return {
-    steps: payload.plan,
-    verification: payload.verification ?? [],
-    notes: payload.notes
-  };
+  verification: VerifyStep[];
+  artifacts?: { screenshots?: string[] };
 }
