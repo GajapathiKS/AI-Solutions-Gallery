@@ -1,8 +1,12 @@
 Navigate to http://localhost:4200/students to view the students list.
 
-Search for student STU700 (TestStudent Automation) in the table.
+IMPORTANT TABLE STRUCTURE: The table has 4 columns in this order:
+Column 1: Last Name
+Column 2: First Name  
+Column 3: Local ID (this contains "GL245671" for the target student)
+Column 4: Actions (contains the Open button as <a class="btn">)
 
-Click on STU700 to view student details.
+Find the table row where the 3rd column (td:nth-child(3)) contains exactly "GL245671", then click the Open button in the 4th column (td:nth-child(4)) of that same row.
 
 Navigate to the Needs Assessments section.
 

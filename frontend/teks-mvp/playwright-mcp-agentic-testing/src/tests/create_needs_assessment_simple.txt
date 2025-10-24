@@ -1,0 +1,34 @@
+STEP 1: Wait for the students table to load. Look for a table with student records.
+
+STEP 2: In the table, find the row where Local ID is "GL245671". Click the "Open" button in that row.
+
+STEP 3: Wait for the student details page to load. Click the "Needs Assessments" tab.
+
+STEP 4: Click the "+ New Needs Assessment" button.
+
+STEP 5: Fill the form fields:
+
+academicNeeds: Student demonstrates solid foundational reading skills but requires targeted support for reading fluency and stamina. Can decode most grade-level texts but needs practice with expression and phrasing. Benefits from structured literacy routines and consistent practice opportunities.
+
+supportServices: - Supplemental reading support 2x per week
+- Access to high-interest reading materials
+- Reading fluency software program
+- Parent training for home reading practice
+- Book club participation
+
+instructionalStrategies: - Repeated reading practice with feedback
+- Reader's theater and poetry performance
+- Think-aloud modeling during read-alouds
+- Goal-setting for reading fluency improvement
+- Choice reading time with conferencing
+- Partnerships with strong reader models
+
+assessmentTools: - WCPM (Words Correct Per Minute) tracking
+- Fluency progress graphs shared with student
+- Informal reading inventories
+- Student self-assessment rubrics
+- Reading logs and reflections
+
+STEP 6: Click the "Create" button to submit the form.
+
+IMPORTANT: Do ONE step at a time. After clicking a button, WAIT - don't try to do the next step immediately. The page needs to load first.

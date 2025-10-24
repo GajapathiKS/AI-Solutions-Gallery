@@ -1,7 +1,7 @@
 Create a new student with these details:
-- Local ID: STU7012
-- First Name: Maria
-- Last Name: Rodriguez
+- Local ID: GHL24567124
+- First Name: Hruthik Gaja
+- Last Name: Pathi
 - Date of Birth: 2014-03-22
 - Grade Level: 5
 - Campus: Washington Middle School

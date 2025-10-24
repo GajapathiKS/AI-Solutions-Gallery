@@ -6,8 +6,8 @@ import { Command } from "commander";
 import { fileURLToPath } from "url";
 
 import { RunLogger } from "./core/logger.js";
-import { McpClient } from "./core/mcpClient.js";
-import { BedrockClient } from "./core/bedrockClient.js";
+import { McpClient, setSharedMcpClient } from "./core/mcpClient.js";
+import { BedrockClient, setSharedBedrockClient } from "./core/bedrockClient.js";
 import { DomIntelligentAgent } from "./agents/domIntelligentAgent.js";
 import { loadAgentConfig, selectEnvironment } from "./core/env.js";
 
@@ -59,10 +59,12 @@ async function main() {
 
   // Initialize Bedrock client
   const bedrock = new BedrockClient();
+  setSharedBedrockClient(bedrock);
   
   // Start MCP client and connect to server
   const mcpClient = new McpClient(logger);
   await mcpClient.connect(config.mcp);
+  setSharedMcpClient(mcpClient);
 
   try {
     const domAgent = new DomIntelligentAgent(mcpClient, logger, bedrock);

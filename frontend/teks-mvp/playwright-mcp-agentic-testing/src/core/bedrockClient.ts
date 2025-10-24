@@ -203,3 +203,36 @@ export class BedrockClient {
     return payload?.output?.message?.content?.[0]?.text ?? "";
   }
 }
+
+let sharedBedrockClient: BedrockClient | undefined;
+
+export function setSharedBedrockClient(client: BedrockClient): void {
+  sharedBedrockClient = client;
+}
+
+export function getSharedBedrockClient(): BedrockClient {
+  if (!sharedBedrockClient) {
+    sharedBedrockClient = new BedrockClient();
+  }
+  return sharedBedrockClient;
+}
+
+export async function bedrockConverse(system: string, user: string): Promise<string> {
+  const client = getSharedBedrockClient();
+  let attempt = 0, lastErr: any;
+  while (attempt < 5) {
+    try {
+      return await client.generateText(system, user);
+    } catch (e: any) {
+      lastErr = e;
+      const msg = String(e?.message || "");
+      if (!/429|Too many requests/i.test(msg)) break;
+      const backoff = Math.min(500 * Math.pow(2, attempt), 15000);
+      await new Promise(r => setTimeout(r, backoff));
+      attempt++;
+    }
+  }
+  throw lastErr;
+}
+
+

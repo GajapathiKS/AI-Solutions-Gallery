@@ -3,7 +3,7 @@ import fs from 'fs/promises';
 import { PlannerAgent } from '../agents/plannerAgent.js';
 // import { ObserverAgent } from '../agents/observerAgent.js'; // not used in current flow
 import { ExecutorAgent } from '../agents/executorAgent.js';
-import { BedrockClient } from './bedrockClient.js';
+import { BedrockClient, setSharedBedrockClient } from './bedrockClient.js';
 
 import { McpClient } from './mcpClient.js';
 import { RunLogger } from './logger.js';
@@ -23,6 +23,7 @@ export async function runAgenticTest(
 
   // 1) Plan using Bedrock-backed planner with baseline fallback
   const bedrock = process.env.AWS_BEARER_TOKEN_BEDROCK ? new BedrockClient() : undefined;
+  if (bedrock) setSharedBedrockClient(bedrock);
   const planner = new PlannerAgent(logger, bedrock);
   const plan = await planner.createPlan(goalText, { baseUrl: env.baseUrl, timeoutMs: env.timeoutMs });
 

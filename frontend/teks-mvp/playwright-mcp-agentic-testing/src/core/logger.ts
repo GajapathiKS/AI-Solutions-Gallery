@@ -20,3 +20,7 @@ export class RunLogger {
   error(msg: string, data?: Record<string, unknown>) { this.line("ERROR", msg, data); }
   debug(msg: string, data?: Record<string, unknown>) { this.line("DEBUG", msg, data); }
 }
+export const logger = {
+  info: (...args: any[]) => console.log("[INFO]", ...args),
+  error: (...args: any[]) => console.error("[ERROR]", ...args),
+};

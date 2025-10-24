@@ -35,7 +35,7 @@ export class ExecutorAgent {
     private readonly logger: RunLogger,
     private readonly environment: EnvironmentSettings,
     private readonly runDir: string
-  ) {}
+  ) { }
 
   async executePlan(plan: AgentPlan): Promise<void> {
     let stepIndex = 0;
@@ -51,7 +51,7 @@ export class ExecutorAgent {
         await this.client.callTool({
           name: "browser_take_screenshot",
           arguments: { path: path.join(this.runDir, sname), fullPage: true }
-        }).catch(() => {});
+        }).catch(() => { });
         throw e;
       }
     }
@@ -77,8 +77,9 @@ export class ExecutorAgent {
             // Best-effort: evaluate location.href and check substring
             const res = await this.client.callTool({
               name: "browser_evaluate",
-              arguments: { expression: "() => location.href" }
+              arguments: { function: "() => location.href" }
             }).catch(() => null);
+
             const href = extractText(res);
             if (!v.value || !href.includes(v.value)) {
               throw new Error(`URL verification failed; expected to include ${v.value}, got ${href}`);
@@ -105,7 +106,7 @@ export class ExecutorAgent {
             break;
           case "screenshot":
             // LLM suggests screenshot as verification; take one
-            const shotName = (v.value || `verify_${vIndex}`).endsWith('.png') 
+            const shotName = (v.value || `verify_${vIndex}`).endsWith('.png')
               ? v.value || `verify_${vIndex}.png`
               : `${v.value || `verify_${vIndex}`}.png`;
             const shotPath = path.join(this.runDir, shotName);
@@ -125,7 +126,7 @@ export class ExecutorAgent {
         await this.client.callTool({
           name: "browser_take_screenshot",
           arguments: { path: path.join(this.runDir, sname), fullPage: true }
-        }).catch(() => {});
+        }).catch(() => { });
         throw e;
       }
     }
@@ -145,7 +146,7 @@ export class ExecutorAgent {
         await this.client.callTool({
           name: "browser_click",
           arguments: { selector: step.target }
-        }).catch(() => {});
+        }).catch(() => { });
         // Then type with slowly=true to trigger change events
         await this.client.callTool({
           name: "browser_type",

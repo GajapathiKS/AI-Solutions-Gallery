@@ -1,0 +1,24 @@
+# .github/workflows/agentic-tests.yml
+name: Agentic E2E
+on: [push, workflow_dispatch]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: npm ci
+      - run: npx playwright install --with-deps
+      - env:
+          AWS_REGION: eu-north-1
+          BEDROCK_MODEL_ID: amazon.nova-lite-v1:0
+          AWS_BEARER_TOKEN_BEDROCK: ${{ secrets.AWS_BEARER_TOKEN_BEDROCK }}
+        run: |
+          # Start SUT if needed (Angular/API) & wait
+          # Run loop orchestrator
+          node dist/cli-loop.js --goal "Create student and verify in list" --url "http://localhost:4200/students/new" --run-id ci-${{ github.run_id }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: reports
+          path: reports/**

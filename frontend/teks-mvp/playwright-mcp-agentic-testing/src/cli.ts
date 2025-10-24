@@ -7,7 +7,7 @@ import { fileURLToPath } from "url";
 
 import { runAgenticTest } from "./core/orchestrator.js";
 import { RunLogger } from "./core/logger.js";
-import { McpClient } from "./core/mcpClient.js";
+import { McpClient, setSharedMcpClient } from "./core/mcpClient.js";
 import { loadAgentConfig, selectEnvironment } from "./core/env.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -54,6 +54,7 @@ async function main() {
   // Start MCP client and connect to server
   const mcpClient = new McpClient(logger);
   await mcpClient.connect(config.mcp);
+  setSharedMcpClient(mcpClient);
 
   try {
     await runAgenticTest(

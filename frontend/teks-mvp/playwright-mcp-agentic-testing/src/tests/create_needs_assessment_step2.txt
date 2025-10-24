@@ -1,0 +1,3 @@
+Click on the "Needs Assessments" tab or button to navigate to the Needs Assessments section.
+
+Then click the "+ New Needs Assessment" button to open the form.
