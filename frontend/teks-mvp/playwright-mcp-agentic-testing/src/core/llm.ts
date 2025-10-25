@@ -17,7 +17,7 @@ export const SYSTEM_RULES = [
   "Never create elements (no document.createElement/appendChild). Interact with EXISTING controls.",
   "Do NOT use :contains() or setTimeout.",
   "Use let (not const) for reassignable variables.",
-  "After setting input/textarea/select values, dispatch BOTH 'input' and 'change' with { bubbles: true } (Angular Reactive Forms).",
-  "Prefer selectors: [formcontrolname], [name], #id, [placeholder] and visible button text.",
+  "After setting input/textarea/select values, dispatch BOTH 'input' and 'change' events with { bubbles: true } to trigger framework change detection.",
+  "Prefer selectors: [formcontrolname], [name], #id, [placeholder], data-testid, and visible button text.",
   "If a control isn't found, search by label text via Array.from(...).find(...) and match normalized innerText.",
 ].join("\n");

@@ -29,30 +29,30 @@ export class PlannerAgent {
   ) {}
 
   async createPlan(goalText: string, ctx: { baseUrl: string; timeoutMs: number }): Promise<AgentPlan> {
-    const system = `You are an E2E test planner for a Playwright+MCP agent testing an Angular application.
+    const system = `You are an E2E test planner for a Playwright+MCP agent testing web applications.
 Return JSON with { steps: Step[], verification: VerifyStep[] }.
 
-IMPORTANT for Angular forms: 
-- The "type" action does NOT trigger Angular form validation or change detection
-- The "click" action does NOT trigger Angular (click) event handlers
+IMPORTANT for modern web frameworks (React, Angular, Vue, etc.): 
+- The "type" action does NOT always trigger framework validation or change detection
+- The "click" action does NOT always trigger framework event handlers
 - When filling forms, click each input first, then type into it
-- To submit Angular forms, use "evaluate" step type to call the submit function directly
+- To submit forms reliably, use "evaluate" step type to call the submit function directly
 
 Available step types:
 - navigate: Navigate to URL (value = full URL)
 - type: Type text into input (target = CSS selector, value = text)
-- click: Click element (target = CSS selector) - NOTE: Does NOT trigger Angular click handlers
+- click: Click element (target = CSS selector) - NOTE: May not trigger all framework handlers
 - evaluate: Execute JavaScript code (code = JS to run, e.g., "document.querySelector('button').click()")
 - press: Press keyboard key (target = selector, value = key name)
 - selectOption: Select dropdown option
 - hover, drag, waitFor, screenshot, resize
 
-Best practices for Angular apps:
+Best practices for framework-based apps:
 1. Use click + type for each form field
 2. Use "evaluate" with code like "document.querySelector('form').submit()" to submit forms
 3. Or use "evaluate" to directly call component methods if needed
 
-- verification must include at least one step, e.g. {type:"visible",target:"#students-tab"}.`;
+- verification must include at least one step (e.g., check for success message, URL change, or new page content).`;
 
 
     const user = `Goal:\n${goalText}\n\nBase URL: ${ctx.baseUrl}\nDefault timeout: ${ctx.timeoutMs}ms\n`;
@@ -88,13 +88,13 @@ Best practices for Angular apps:
       const parsed = PlanSchema.safeParse(raw);
       if (!parsed.success) {
         this.logger.warn("Planner JSON parse failed, building fallback plan", { issues: parsed.error.issues as any });
-        // conservative fallback: just navigate to possible login & leave verification visible Students tab
+        // Generic fallback: just navigate to base URL with basic verification
         const fallback: AgentPlan = {
           steps: [
-            { type: "navigate", value: `${ctx.baseUrl}/login` },
+            { type: "navigate", value: ctx.baseUrl },
           ],
           verification: [
-            { type: "visible", target: "#students-tab", timeoutMs: ctx.timeoutMs }
+            { type: "url", value: ctx.baseUrl, timeoutMs: ctx.timeoutMs }
           ],
         };
         return fallback;
@@ -102,7 +102,8 @@ Best practices for Angular apps:
 
       const plan = parsed.data as AgentPlan;
       if (!plan.verification?.length) {
-        plan.verification = [{ type: "visible", target: "#students-tab", timeoutMs: ctx.timeoutMs }];
+        // Generic verification: check URL matches base URL
+        plan.verification = [{ type: "url", value: ctx.baseUrl, timeoutMs: ctx.timeoutMs }];
       }
       return plan;
     } catch (err: any) {
@@ -132,13 +133,13 @@ Best practices for Angular apps:
           { type: "type", target: 'input[name="username"], #username, [data-testid="username"]', value: username },
           { type: "type", target: 'input[name="password"], #password, [data-testid="password"]', value: password },
           { type: "click", target: 'button[type="submit"], button[data-testid="submit"], button:has-text("Submit")' },
-          { type: "waitFor", target: '[data-testid="students-heading"]', timeoutMs: ctx.timeoutMs },
+          { type: "waitFor", target: 'main, [role="main"], .content, #content', timeoutMs: ctx.timeoutMs },
           { type: "screenshot", value: shotName }
         );
       }
 
       const verification: AgentPlan["verification"] = [
-        { type: "visible", target: '[data-testid="students-heading"]', timeoutMs: ctx.timeoutMs }
+        { type: "url", value: ctx.baseUrl, timeoutMs: ctx.timeoutMs }
       ];
 
       return { steps, verification };

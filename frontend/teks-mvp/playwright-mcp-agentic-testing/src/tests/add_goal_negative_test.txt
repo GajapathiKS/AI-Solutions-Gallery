@@ -1,0 +1,11 @@
+Try to create a goal with missing required fields:
+
+Fill Description: Test incomplete form
+Leave Category field EMPTY (required)
+Leave Measurement field EMPTY (required)
+Fill Owner: Test Owner
+Leave Target Date EMPTY (required)
+
+Click the Create button.
+
+Expected: Form should prevent submission and show validation errors for the empty required fields.

@@ -1,10 +1,10 @@
 Create a new student with these details:
-- Local ID: GHL24567124
-- First Name: Hruthik Gaja
-- Last Name: Pathi
+- Local ID: ABCDEFG5679
+- First Name: Shiplaa
+- Last Name: Sreenivasan
 - Date of Birth: 2014-03-22
 - Grade Level: 5
-- Campus: Washington Middle School
+- Campus: Noida
 - Program Focus: Math Enrichment
 - Guardian Contact: rodriguez@email.com
 - Enrollment Date: 2024-09-01

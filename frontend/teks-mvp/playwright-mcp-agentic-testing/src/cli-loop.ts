@@ -27,8 +27,15 @@ async function main() {
     // Read goal from file
     goalText = fs.readFileSync(path.resolve(firstArg), "utf-8").trim();
   } else {
-    // Use --goal flag or default
-    goalText = getArg("--goal") || "Create student and verify in list";
+    // Use --goal flag or require test file
+    const goalArg = getArg("--goal");
+    if (!goalArg) {
+      console.error("ERROR: Please provide a test file or use --goal flag");
+      console.error("Usage: node dist/cli-loop.js <test-file.txt> --url <url>");
+      console.error("   or: node dist/cli-loop.js --goal \"Fill form and submit\" --url <url>");
+      process.exit(1);
+    }
+    goalText = goalArg;
   }
   
   const urlArg = getArg("--url");

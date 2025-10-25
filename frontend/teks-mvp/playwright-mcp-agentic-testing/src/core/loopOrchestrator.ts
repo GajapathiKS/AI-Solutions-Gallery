@@ -5,7 +5,12 @@ import { logger } from "./logger.js";
 import { sanitizeJs, SYSTEM_RULES } from "./llm.js";
 
 type LoopInput = { goal: string; maxSteps?: number; url?: string; };
-type LoopResult = { status: "done" | "incomplete"; steps: number; reason?: string; };
+type LoopResult = { 
+  status: "done" | "incomplete"; 
+  steps: number; 
+  reason?: string;
+  validationErrors?: string[];  // NEW: Actual error messages from the page
+};
 
 export async function runAgentLoop({ goal, maxSteps = 12, url }: LoopInput): Promise<LoopResult> {
   const mcp = getSharedMcpClient();
@@ -44,6 +49,12 @@ export async function runAgentLoop({ goal, maxSteps = 12, url }: LoopInput): Pro
       logger.error({ t: "wait_timeout", message: "Page did not load elements after 10 seconds" });
     }
   }
+
+  // Track validation errors and navigation across steps
+  let validationErrorCount = 0;
+  let stuckOnSameRoute = 0;
+  let lastRoute = "";
+  const collectedValidationErrors: string[] = [];  // NEW: Collect actual error messages
 
   for (let step = 1; step <= maxSteps; step++) {
     const obs = await getDomSnapshot();
@@ -104,6 +115,14 @@ export async function runAgentLoop({ goal, maxSteps = 12, url }: LoopInput): Pro
     const html = await pageBodyHtml(mcp);
     const newObs = await getDomSnapshot();
     
+    // Track if we're stuck on the same route (validation blocking)
+    if (newObs.route === lastRoute) {
+      stuckOnSameRoute++;
+    } else {
+      stuckOnSameRoute = 0;
+    }
+    lastRoute = newObs.route;
+    
     // Only detect success if we navigated AND there's a success indicator in the URL or page
     // This prevents stopping too early on intermediate navigations
     const urlHasSuccessParam = /[?&](added|created|success|saved)=/.test(newObs.route);
@@ -118,6 +137,23 @@ export async function runAgentLoop({ goal, maxSteps = 12, url }: LoopInput): Pro
     if (hasSuccessMessage) {
       logger.info({ t: "done", step, reason: "Success message found" });
       return { status: "done", steps: step, reason: "Success message found" };
+    }
+    
+    // SMART SUCCESS DETECTION: Detect form-to-list transitions without explicit success params
+    // If we navigated from a "/new" or "/create" form to a list page, and the list has items, assume success
+    const wasOnFormPage = /\/(new|create|add|edit)/.test(obs.route);
+    const nowOnListPage = newObs.route !== obs.route && !(/\/(new|create|add|edit)/.test(newObs.route));
+    const hasTableOrCards = /<table|class=".*card|class=".*list-item|class=".*data-row/.test(html);
+    
+    if (wasOnFormPage && nowOnListPage && hasTableOrCards) {
+      logger.info({ 
+        t: "done", 
+        step, 
+        reason: "Smart success: form submission + navigation to list page", 
+        oldRoute: obs.route, 
+        newRoute: newObs.route 
+      });
+      return { status: "done", steps: step, reason: "Form submitted and navigated to list" };
     }
     
     // Check console for submit attempts (form validation passing and API called)
@@ -157,7 +193,81 @@ export async function runAgentLoop({ goal, maxSteps = 12, url }: LoopInput): Pro
         logger.error({ t: "console_error", error: String(e) });
       }
     }
+    
+    // Check for validation errors on every step (not just last)
+    if (/required|invalid|error|must|should/i.test(html)) {
+      validationErrorCount++;
+      
+      // Extract actual error messages from the page
+      try {
+        const errorsRes = await mcp.call("browser_evaluate", {
+          function: `() => {
+            const errorElements = Array.from(document.querySelectorAll('.error, .invalid, .validation-error, [class*="error"], [class*="invalid"]'));
+            const errorTexts = errorElements
+              .map(el => el.textContent?.trim())
+              .filter(text => text && text.length > 0 && text.length < 200)
+              .filter(text => /required|invalid|must|should|error|cannot|failed/i.test(text));
+            return [...new Set(errorTexts)]; // Remove duplicates
+          }`
+        });
+        const errorMessages = JSON.parse(unwrapText(errorsRes));
+        if (Array.isArray(errorMessages) && errorMessages.length > 0) {
+          errorMessages.forEach(msg => {
+            if (!collectedValidationErrors.includes(msg)) {
+              collectedValidationErrors.push(msg);
+            }
+          });
+          logger.info({ t: "validation_errors", step, errors: errorMessages });
+        }
+      } catch (e) {
+        // Ignore error extraction failures
+      }
+    }
+    
+    // EARLY EXIT: If we've tried 3 times with validation errors and stuck on same page, stop immediately
+    if (step >= 3 && validationErrorCount >= 3 && stuckOnSameRoute >= 2) {
+      logger.info({ 
+        t: "early_exit", 
+        step, 
+        reason: "Form validation blocking detected - stopping test early",
+        validationErrorCount,
+        stuckOnSameRoute,
+        validationErrors: collectedValidationErrors
+      });
+      
+      // Take screenshot for evidence
+      try {
+        await mcp.call("browser_take_screenshot", { path: `./validation-failure-${Date.now()}.png` });
+        logger.info({ t: "screenshot", message: "Saved validation failure screenshot" });
+      } catch (e) {
+        logger.error({ t: "screenshot", error: String(e) });
+      }
+      
+      return { 
+        status: "incomplete", 
+        steps: step, 
+        reason: "Form validation errors preventing submission",
+        validationErrors: collectedValidationErrors
+      };
+    }
   }
 
-  return { status: "incomplete", steps: maxSteps, reason: "Max steps reached" };
+  // Determine the most meaningful failure reason
+  let failureReason = "Max steps reached";
+  
+  // If we detected validation errors multiple times and stayed on same route, it's validation blocking
+  if (validationErrorCount >= 3 && stuckOnSameRoute >= 3) {
+    failureReason = "Form validation errors preventing submission";
+  } else if (stuckOnSameRoute >= 5) {
+    failureReason = "Stuck on same page - possible validation or UI issue";
+  } else if (validationErrorCount > 0) {
+    failureReason = "Validation errors detected in form";
+  }
+
+  return { 
+    status: "incomplete", 
+    steps: maxSteps, 
+    reason: failureReason,
+    validationErrors: collectedValidationErrors.length > 0 ? collectedValidationErrors : undefined
+  };
 }
