@@ -4,8 +4,16 @@ export type VoiceAssistPrompt = {
   instruction: string;
 };
 
+export type VoiceAssistProviderPreset = {
+  id: string;
+  label: string;
+  description?: string;
+  config?: Partial<VoiceAssistAiConfig>;
+};
+
 export type VoiceAssistAiConfig = {
   provider?: string;
+  providerPreset?: string;
   endpoint?: string;
   apiKey?: string;
   model?: string;
@@ -18,6 +26,26 @@ export type VoiceAssistAiConfig = {
     prompt: VoiceAssistPrompt;
   }) => unknown;
   transformResponse?: (data: unknown) => string;
+};
+
+export type VoiceAssistAdminConfig = {
+  allowRuntimeConfig?: boolean;
+  persistRuntimeConfig?: boolean;
+  storageKey?: string;
+  exposeApiKeyField?: boolean;
+  editableRuntimeFields?: Array<'providerPreset' | 'endpoint' | 'apiKey' | 'model' | 'systemPrompt'>;
+  providerPresets?: VoiceAssistProviderPreset[];
+  allowedEndpoints?: string[];
+};
+
+export type VoiceAssistBranding = {
+  title?: string;
+  configButtonLabel?: string;
+};
+
+export type VoiceAssistUiConfig = {
+  theme?: 'default' | 'slate' | 'high-contrast';
+  density?: 'comfortable' | 'compact';
 };
 
 export type VoiceAssistSpeechConfig = {
@@ -39,6 +67,9 @@ export interface VoiceAssistOptions {
   autoAttach?: boolean;
   prompts?: VoiceAssistPrompt[];
   aiConfig?: Partial<VoiceAssistAiConfig>;
+  adminConfig?: VoiceAssistAdminConfig;
+  branding?: VoiceAssistBranding;
+  uiConfig?: VoiceAssistUiConfig;
   aiInsertionMode?: 'append' | 'replace-selection' | 'replace-all';
   speechConfig?: VoiceAssistSpeechConfig;
   aiRequest?: VoiceAssistAiRequest;
@@ -59,9 +90,13 @@ export declare class VoiceAssistPlugin {
   stopSpeechCapture(): void;
 
   runAiAction(prompt: VoiceAssistPrompt): Promise<void>;
+  readSelectionAloud(): void;
+  stopReadAloud(): void;
+  summarizeSelection(): void;
 
   getAIConfig(): VoiceAssistAiConfig;
   setAIConfig(config: Partial<VoiceAssistAiConfig>): void;
+  setRuntimeAIConfig(config: Partial<VoiceAssistAiConfig>): void;
 
   getSpeechConfig(): VoiceAssistSpeechConfig;
   setSpeechConfig(config: Partial<VoiceAssistSpeechConfig>): void;
@@ -74,6 +109,11 @@ export declare class VoiceAssistPlugin {
 
 export declare const DEFAULT_PROMPTS: VoiceAssistPrompt[];
 export declare const DEFAULT_AI_CONFIG: VoiceAssistAiConfig;
+export declare const DEFAULT_ADMIN_CONFIG: VoiceAssistAdminConfig;
+export declare const DEFAULT_PROVIDER_PRESETS: VoiceAssistProviderPreset[];
+export declare const DEFAULT_BRANDING: VoiceAssistBranding;
+export declare const DEFAULT_UI_CONFIG: VoiceAssistUiConfig;
+export declare function isEndpointAllowed(endpoint: string, allowedEndpoints?: string[]): boolean;
 export declare const defaultAiRequest: VoiceAssistAiRequest;
 
 export default VoiceAssistPlugin;

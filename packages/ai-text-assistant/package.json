@@ -1,7 +1,7 @@
 {
-  "name": "voice-assist-plugin",
+  "name": "ai-text-assistant-plugin",
   "version": "0.1.0",
-  "description": "Framework-agnostic speech-to-text and AI text assistant plugin for web text inputs.",
+  "description": "Framework-agnostic AI Text Assistant plugin for web apps with speech-to-text, selection read-aloud, summarization, and admin-governed AI runtime settings.",
   "type": "module",
   "main": "src/index.js",
   "module": "src/index.js",
