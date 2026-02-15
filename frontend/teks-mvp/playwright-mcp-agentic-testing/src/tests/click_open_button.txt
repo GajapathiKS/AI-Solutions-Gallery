@@ -1,3 +1,0 @@
-Find the table row where the Local ID column contains "GL245671".
-
-In that row, click the "Open" button.
