@@ -1026,6 +1026,7 @@ export class VoiceAssistPlugin {
       ...(options.aiConfig || {}),
       ...this.readPersistedRuntimeConfig()
     };
+    this.assertAllowedEndpoint(this.aiConfig.endpoint);
     const defaultSpeechConfig = {
       locale: 'en-US',
       interimResults: false,
@@ -1098,11 +1099,13 @@ export class VoiceAssistPlugin {
     const editableFields = this.getEditableRuntimeFields();
     const nextConfig = {};
     const providerPreset = String(formData.get('providerPreset') || '');
-    if (providerPreset && editableFields.includes('providerPreset')) {
+    if (editableFields.includes('providerPreset')) {
       nextConfig.providerPreset = providerPreset;
-      const preset = this.adminConfig.providerPresets.find((item) => item.id === providerPreset);
-      if (preset && preset.config) {
-        Object.assign(nextConfig, preset.config);
+      if (providerPreset) {
+        const preset = this.adminConfig.providerPresets.find((item) => item.id === providerPreset);
+        if (preset && preset.config) {
+          Object.assign(nextConfig, preset.config);
+        }
       }
     }
     editableFields.forEach((field) => {
@@ -1123,7 +1126,11 @@ export class VoiceAssistPlugin {
       const raw = window.localStorage.getItem(this.adminConfig.storageKey);
       if (!raw) return {};
       const parsed = JSON.parse(raw);
-      return pickRuntimeConfig(parsed, this.getEditableRuntimeFields());
+      const runtimeConfig = pickRuntimeConfig(parsed, this.getEditableRuntimeFields());
+      if ('endpoint' in runtimeConfig) {
+        this.assertAllowedEndpoint(runtimeConfig.endpoint);
+      }
+      return runtimeConfig;
     } catch (error) {
       return {};
     }
