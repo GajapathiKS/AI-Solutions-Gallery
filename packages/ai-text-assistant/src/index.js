@@ -38,6 +38,24 @@ const DEFAULT_PROVIDER_PRESETS = [
     config: {}
   },
   {
+    id: 'openai-official',
+    label: 'OpenAI API',
+    description: 'Direct OpenAI endpoint with GPT models.',
+    config: {
+      endpoint: 'https://api.openai.com/v1/chat/completions',
+      model: 'gpt-4o-mini'
+    }
+  },
+  {
+    id: 'azure-openai',
+    label: 'Azure OpenAI',
+    description: 'Use your Azure OpenAI deployment endpoint path.',
+    config: {
+      endpoint: '',
+      model: 'gpt-4o-mini'
+    }
+  },
+  {
     id: 'ollama-local',
     label: 'Ollama (local)',
     description: 'Run fully local models via Ollama on your own infrastructure.',
@@ -48,6 +66,15 @@ const DEFAULT_PROVIDER_PRESETS = [
     }
   },
   {
+    id: 'gemini-openai-compatible',
+    label: 'Gemini (OpenAI compatible)',
+    description: 'Gemini endpoint using Google OpenAI-compatible route.',
+    config: {
+      endpoint: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
+      model: 'gemini-1.5-flash'
+    }
+  },
+  {
     id: 'groq-llama-free',
     label: 'Groq + Llama 3.1 8B',
     description: 'Fast hosted model that can be used with free-tier credentials.',
@@ -55,7 +82,53 @@ const DEFAULT_PROVIDER_PRESETS = [
       endpoint: 'https://api.groq.com/openai/v1/chat/completions',
       model: 'llama-3.1-8b-instant'
     }
+  },
+  {
+    id: 'deepseek-chat',
+    label: 'DeepSeek Chat',
+    description: 'DeepSeek API in OpenAI-compatible chat format.',
+    config: {
+      endpoint: 'https://api.deepseek.com/v1/chat/completions',
+      model: 'deepseek-chat'
+    }
+  },
+  {
+    id: 'claude-proxy',
+    label: 'Claude (via your proxy)',
+    description: 'Use your own backend proxy that normalizes Claude responses to OpenAI format.',
+    config: {
+      endpoint: '/api/claude/v1/chat/completions',
+      model: 'claude-3-5-sonnet-latest'
+    }
+  },
+  {
+    id: 'amazon-bedrock-proxy',
+    label: 'Amazon Bedrock (via your proxy)',
+    description: 'Use a Bedrock proxy endpoint that accepts OpenAI-style payloads.',
+    config: {
+      endpoint: '/api/bedrock/v1/chat/completions',
+      model: 'anthropic.claude-3-5-sonnet-20240620-v1:0'
+    }
+  },
+  {
+    id: 'sarvam-proxy',
+    label: 'Sarvam AI (via your proxy)',
+    description: 'Use a Sarvam-compatible proxy endpoint for normalized chat output.',
+    config: {
+      endpoint: '/api/sarvam/v1/chat/completions',
+      model: 'sarvam-m'
+    }
   }
+];
+
+const DEFAULT_MODEL_OPTIONS = [
+  'gpt-4o-mini',
+  'gpt-4.1-mini',
+  'llama3.2:3b',
+  'gemini-1.5-flash',
+  'llama-3.1-8b-instant',
+  'deepseek-chat',
+  'claude-3-5-sonnet-latest'
 ];
 
 const DEFAULT_ADMIN_CONFIG = {
@@ -65,7 +138,8 @@ const DEFAULT_ADMIN_CONFIG = {
   exposeApiKeyField: false,
   editableRuntimeFields: ['providerPreset', 'endpoint', 'model', 'systemPrompt'],
   providerPresets: DEFAULT_PROVIDER_PRESETS,
-  allowedEndpoints: []
+  allowedEndpoints: [],
+  modelOptions: DEFAULT_MODEL_OPTIONS
 };
 
 const DEFAULT_BRANDING = {
@@ -289,6 +363,71 @@ const BASE_STYLES = `
   padding: 0.55rem;
 }
 
+
+
+.voice-assist-selection-popup {
+  position: absolute;
+  z-index: 100000;
+  display: none;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem;
+  border-radius: 14px;
+  border: 1px solid rgba(126, 146, 255, 0.35);
+  background: linear-gradient(180deg, rgba(18, 26, 58, 0.96), rgba(13, 20, 45, 0.96));
+  color: #f8fafc;
+  box-shadow: 0 14px 40px rgba(2, 6, 23, 0.45);
+  backdrop-filter: blur(6px);
+}
+
+.voice-assist-selection-popup.open {
+  display: inline-flex;
+}
+
+.voice-assist-selection-popup::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  left: 50%;
+  bottom: -7px;
+  transform: translateX(-50%) rotate(45deg);
+  background: rgba(13, 20, 45, 0.96);
+  border-right: 1px solid rgba(126, 146, 255, 0.35);
+  border-bottom: 1px solid rgba(126, 146, 255, 0.35);
+}
+
+.voice-assist-selection-popup .actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.voice-assist-selection-popup .divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(148, 163, 184, 0.35);
+  margin: 0 0.05rem;
+}
+
+.voice-assist-selection-popup .actions button {
+  border: none;
+  border-radius: 10px;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #e2e8f0;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.voice-assist-selection-popup .actions button:hover {
+  background: rgba(99, 102, 241, 0.25);
+  color: #ffffff;
+}
 @keyframes va-fade-in {
   from { opacity: 0; transform: scale(0.97); }
   to { opacity: 1; transform: scale(1); }
@@ -741,7 +880,12 @@ class AssistUI {
       this.configForm.appendChild(this.createLabeledInput('API key', 'text', 'apiKey'));
     }
     if (editableFields.includes('model')) {
-      this.configForm.appendChild(this.createLabeledInput('Model name', 'text', 'model'));
+      const modelOptions = this.plugin.getModelOptions();
+      if (Array.isArray(modelOptions) && modelOptions.length) {
+        this.configForm.appendChild(this.createLabeledSelect('Model', 'model', modelOptions));
+      } else {
+        this.configForm.appendChild(this.createLabeledInput('Model name', 'text', 'model'));
+      }
     }
     if (editableFields.includes('systemPrompt')) {
       this.configForm.appendChild(this.createLabeledTextarea('System prompt', 'systemPrompt'));
@@ -865,7 +1009,7 @@ class AssistUI {
     const providerPreset = this.configForm.querySelector('select[name="providerPreset"]');
     const endpoint = this.configForm.querySelector('input[name="endpoint"]');
     const apiKey = this.configForm.querySelector('input[name="apiKey"]');
-    const model = this.configForm.querySelector('input[name="model"]');
+    const model = this.configForm.querySelector('[name="model"]');
     const systemPrompt = this.configForm.querySelector('textarea[name="systemPrompt"]');
 
     if (providerPreset) providerPreset.value = config.providerPreset || '';
@@ -1011,6 +1155,115 @@ class AssistUI {
   }
 }
 
+
+class SelectionActionPopup {
+  constructor(plugin) {
+    this.plugin = plugin;
+    this.container = null;
+    this.lastResult = '';
+    this.create();
+  }
+
+  create() {
+    if (typeof document === 'undefined') return;
+    const container = document.createElement('div');
+    container.className = 'voice-assist-selection-popup';
+
+    const actions = document.createElement('div');
+    actions.className = 'actions';
+
+    const readBtn = document.createElement('button');
+    readBtn.type = 'button';
+    readBtn.title = 'Read aloud';
+    readBtn.setAttribute('aria-label', 'Read aloud');
+    readBtn.textContent = '🔊';
+    readBtn.addEventListener('click', () => this.plugin.readWindowSelectionAloud());
+
+    const copyBtn = document.createElement('button');
+    copyBtn.type = 'button';
+    copyBtn.title = 'Copy result';
+    copyBtn.setAttribute('aria-label', 'Copy result');
+    copyBtn.textContent = '📋';
+    copyBtn.addEventListener('click', () => this.copyResult());
+
+    const grammarBtn = document.createElement('button');
+    grammarBtn.type = 'button';
+    grammarBtn.title = 'Grammar check';
+    grammarBtn.setAttribute('aria-label', 'Grammar check');
+    grammarBtn.textContent = '📝';
+    grammarBtn.addEventListener('click', () => this.plugin.grammarCheckWindowSelection());
+
+    const summarizeBtn = document.createElement('button');
+    summarizeBtn.type = 'button';
+    summarizeBtn.title = 'Summarize';
+    summarizeBtn.setAttribute('aria-label', 'Summarize');
+    summarizeBtn.textContent = '✨';
+    summarizeBtn.addEventListener('click', () => this.plugin.summarizeWindowSelection());
+
+    actions.appendChild(readBtn);
+    const divider = document.createElement('span');
+    divider.className = 'divider';
+    actions.appendChild(divider);
+    actions.appendChild(copyBtn);
+    actions.appendChild(grammarBtn);
+    actions.appendChild(summarizeBtn);
+
+    container.appendChild(actions);
+    document.body.appendChild(container);
+    this.container = container;
+  }
+
+  showAt(rect) {
+    if (!this.container || !rect) return;
+    this.container.classList.add('open');
+
+    const toolbarWidth = this.container.offsetWidth || 220;
+    const desiredLeft = rect.left + window.scrollX + (rect.width / 2) - (toolbarWidth / 2);
+    const left = Math.min(
+      Math.max(12, desiredLeft),
+      window.scrollX + window.innerWidth - toolbarWidth - 12
+    );
+
+    const top = Math.max(12, rect.top + window.scrollY - this.container.offsetHeight - 10);
+    this.container.style.top = `${top}px`;
+    this.container.style.left = `${left}px`;
+  }
+
+  hide() {
+    if (!this.container) return;
+    this.container.classList.remove('open');
+  }
+
+  setResult(text) {
+    this.lastResult = text || '';
+  }
+
+  async copyResult() {
+    const text = this.lastResult || this.plugin.getWindowSelectionText();
+    if (!text) {
+      this.plugin.ensureUI().setStatus('Nothing to copy yet. Run grammar or summarize first.', 'error');
+      return;
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+      this.plugin.ensureUI().setStatus('Copied to clipboard.', 'success');
+    }
+  }
+
+  contains(node) {
+    return Boolean(this.container && node && this.container.contains(node));
+  }
+
+  destroy() {
+    if (this.container?.parentNode) {
+      this.container.parentNode.removeChild(this.container);
+    }
+    this.container = null;
+    this.lastResult = '';
+  }
+}
+
+
 export class VoiceAssistPlugin {
   constructor(options = {}) {
     if (typeof window === 'undefined' || typeof document === 'undefined') {
@@ -1036,6 +1289,7 @@ export class VoiceAssistPlugin {
     this.aiInsertionMode = options.aiInsertionMode || 'replace-selection';
     this.activeElement = null;
     this.ui = null;
+    this.selectionPopup = null;
     this.root = options.root || document;
     this.autoAttach = options.autoAttach !== false;
     this.isListening = false;
@@ -1048,6 +1302,7 @@ export class VoiceAssistPlugin {
     this.onFocusOut = this.onFocusOut.bind(this);
     this.onWindowChange = this.onWindowChange.bind(this);
     this.onDocumentClick = this.onDocumentClick.bind(this);
+    this.onSelectionChange = this.onSelectionChange.bind(this);
 
     if (this.aiConfig.providerPreset) {
       this.applyProviderPreset(this.aiConfig.providerPreset);
@@ -1080,6 +1335,11 @@ export class VoiceAssistPlugin {
 
   getProviderPresets() {
     return this.adminConfig.providerPresets.slice();
+  }
+
+  getModelOptions() {
+    const modelOptions = this.adminConfig.modelOptions;
+    return Array.isArray(modelOptions) ? modelOptions.slice() : [];
   }
 
   applyProviderPreset(presetId) {
@@ -1159,6 +1419,7 @@ export class VoiceAssistPlugin {
     window.addEventListener('resize', this.onWindowChange);
     document.addEventListener('scroll', this.onWindowChange, true);
     document.addEventListener('click', this.onDocumentClick);
+    document.addEventListener('selectionchange', this.onSelectionChange);
     this.isAttached = true;
   }
 
@@ -1169,6 +1430,7 @@ export class VoiceAssistPlugin {
     window.removeEventListener('resize', this.onWindowChange);
     document.removeEventListener('scroll', this.onWindowChange, true);
     document.removeEventListener('click', this.onDocumentClick);
+    document.removeEventListener('selectionchange', this.onSelectionChange);
     this.isAttached = false;
     this.isReadingAloud = false;
   }
@@ -1184,6 +1446,7 @@ export class VoiceAssistPlugin {
     if (this.ui) {
       this.ui.destroy();
       this.ui = null;
+    this.selectionPopup = null;
     }
     this.activeElement = null;
   }
@@ -1193,6 +1456,14 @@ export class VoiceAssistPlugin {
       this.ui = new AssistUI(this);
     }
     return this.ui;
+  }
+
+
+  ensureSelectionPopup() {
+    if (!this.selectionPopup) {
+      this.selectionPopup = new SelectionActionPopup(this);
+    }
+    return this.selectionPopup;
   }
 
   onFocusIn(event) {
@@ -1225,6 +1496,10 @@ export class VoiceAssistPlugin {
   }
 
   onDocumentClick(event) {
+    if (this.selectionPopup && this.selectionPopup.contains(event.target)) return;
+    if (this.selectionPopup && !this.getWindowSelectionText()) {
+      this.selectionPopup.hide();
+    }
     if (!this.ui || !this.ui.container) return;
     if (!this.ui.isVisible) return;
     if (this.ui.container.contains(event.target)) return;
@@ -1232,16 +1507,59 @@ export class VoiceAssistPlugin {
     this.ui.hide();
   }
 
-  getSelectedText() {
-    if (!this.activeElement) return '';
-    const selection = getActiveSelection(this.activeElement);
-    return (selection.text || '').trim();
+
+  onSelectionChange() {
+    const text = this.getWindowSelectionText();
+    if (!text) {
+      if (this.selectionPopup) this.selectionPopup.hide();
+      return;
+    }
+    const rect = this.getWindowSelectionRect();
+    if (!rect) return;
+    this.ensureSelectionPopup().showAt(rect);
   }
 
-  readSelectionAloud() {
-    const text = this.getSelectedText();
+  getWindowSelectionText() {
+    if (typeof window === 'undefined' || !window.getSelection) return '';
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return '';
+    return selection.toString().trim();
+  }
+
+  getWindowSelectionRect() {
+    if (typeof window === 'undefined' || !window.getSelection) return null;
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return null;
+    const range = selection.getRangeAt(0);
+    return range.getBoundingClientRect();
+  }
+
+  readWindowSelectionAloud() {
+    const text = this.getWindowSelectionText();
+    this.readTextAloud(text, 'Select text first, then use Read aloud.');
+  }
+
+  grammarCheckWindowSelection() {
+    const text = this.getWindowSelectionText();
+    this.runAiOnWindowSelection({
+      text,
+      label: 'Grammar check',
+      instruction: 'Fix grammar and spelling in the selected text while preserving original meaning.'
+    });
+  }
+
+  summarizeWindowSelection() {
+    const text = this.getWindowSelectionText();
+    this.runAiOnWindowSelection({
+      text,
+      label: 'Summarize',
+      instruction: 'Summarize the selected text in plain language.'
+    });
+  }
+
+  readTextAloud(text, emptyMessage) {
     if (!text) {
-      this.ensureUI().setStatus('Select text first, then use Read selection.', 'error');
+      this.ensureUI().setStatus(emptyMessage, 'error');
       return;
     }
     if (typeof window === 'undefined' || !window.speechSynthesis) {
@@ -1254,21 +1572,58 @@ export class VoiceAssistPlugin {
     utterance.lang = this.speechConfig.locale || 'en-US';
     utterance.onstart = () => {
       this.isReadingAloud = true;
-      this.ensureUI().setReadAloudState(true);
+      if (this.ui) this.ui.setReadAloudState(true);
       this.ensureUI().setStatus('Reading selected text…');
     };
     utterance.onend = () => {
       this.isReadingAloud = false;
-      this.ensureUI().setReadAloudState(false);
+      if (this.ui) this.ui.setReadAloudState(false);
       this.ensureUI().setStatus('Finished reading selection.', 'success');
     };
     utterance.onerror = () => {
       this.isReadingAloud = false;
-      this.ensureUI().setReadAloudState(false);
+      if (this.ui) this.ui.setReadAloudState(false);
       this.ensureUI().setStatus('Unable to read selection.', 'error');
     };
 
     window.speechSynthesis.speak(utterance);
+  }
+
+  async runAiOnWindowSelection({ text, label, instruction }) {
+    if (!text) {
+      this.ensureUI().setStatus('Select text first.', 'error');
+      return;
+    }
+    this.ensureUI().setStatus(`Running “${label}”…`);
+    const controller = new AbortController();
+    this.pendingAiAbortController = controller;
+    try {
+      const requestHandler = typeof this.options.aiRequest === 'function' ? this.options.aiRequest : defaultAiRequest;
+      const aiResponse = await requestHandler({
+        text,
+        instruction,
+        config: this.aiConfig,
+        signal: controller.signal,
+        prompt: { id: label.toLowerCase().replace(/\s+/g, '-'), label, instruction }
+      });
+      this.ensureSelectionPopup().setResult(aiResponse);
+      this.ensureUI().setStatus(`${label} completed.`, 'success');
+    } catch (error) {
+      this.ensureUI().setStatus(error.message, 'error');
+    } finally {
+      if (this.pendingAiAbortController === controller) this.pendingAiAbortController = null;
+    }
+  }
+
+  getSelectedText() {
+    if (!this.activeElement) return '';
+    const selection = getActiveSelection(this.activeElement);
+    return (selection.text || '').trim();
+  }
+
+  readSelectionAloud() {
+    const text = this.getSelectedText();
+    this.readTextAloud(text, 'Select text first, then use Read selection.');
   }
 
   stopReadAloud() {

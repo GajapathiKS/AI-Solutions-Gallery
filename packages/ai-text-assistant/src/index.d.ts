@@ -36,6 +36,7 @@ export type VoiceAssistAdminConfig = {
   editableRuntimeFields?: Array<'providerPreset' | 'endpoint' | 'apiKey' | 'model' | 'systemPrompt'>;
   providerPresets?: VoiceAssistProviderPreset[];
   allowedEndpoints?: string[];
+  modelOptions?: string[];
 };
 
 export type VoiceAssistBranding = {
@@ -93,6 +94,9 @@ export declare class VoiceAssistPlugin {
   readSelectionAloud(): void;
   stopReadAloud(): void;
   summarizeSelection(): void;
+  readWindowSelectionAloud(): void;
+  grammarCheckWindowSelection(): void;
+  summarizeWindowSelection(): void;
 
   getAIConfig(): VoiceAssistAiConfig;
   setAIConfig(config: Partial<VoiceAssistAiConfig>): void;
