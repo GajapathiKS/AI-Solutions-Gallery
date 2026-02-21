@@ -30,12 +30,134 @@ const DEFAULT_AI_CONFIG = {
   systemPrompt: 'You are a helpful writing assistant.'
 };
 
-const STYLE_ID = 'voice-assist-plugin-style';
+const DEFAULT_PROVIDER_PRESETS = [
+  {
+    id: 'openai-compatible',
+    label: 'OpenAI compatible',
+    description: 'Any endpoint that supports OpenAI chat completions format.',
+    config: {}
+  },
+  {
+    id: 'openai-official',
+    label: 'OpenAI API',
+    description: 'Direct OpenAI endpoint with GPT models.',
+    config: {
+      endpoint: 'https://api.openai.com/v1/chat/completions',
+      model: 'gpt-4o-mini'
+    }
+  },
+  {
+    id: 'azure-openai',
+    label: 'Azure OpenAI',
+    description: 'Use your Azure OpenAI deployment endpoint path.',
+    config: {
+      endpoint: '',
+      model: 'gpt-4o-mini'
+    }
+  },
+  {
+    id: 'ollama-local',
+    label: 'Ollama (local)',
+    description: 'Run fully local models via Ollama on your own infrastructure.',
+    config: {
+      endpoint: 'http://localhost:11434/v1/chat/completions',
+      model: 'llama3.2:3b',
+      apiKey: ''
+    }
+  },
+  {
+    id: 'gemini-openai-compatible',
+    label: 'Gemini (OpenAI compatible)',
+    description: 'Gemini endpoint using Google OpenAI-compatible route.',
+    config: {
+      endpoint: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
+      model: 'gemini-1.5-flash'
+    }
+  },
+  {
+    id: 'groq-llama-free',
+    label: 'Groq + Llama 3.1 8B',
+    description: 'Fast hosted model that can be used with free-tier credentials.',
+    config: {
+      endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+      model: 'llama-3.1-8b-instant'
+    }
+  },
+  {
+    id: 'deepseek-chat',
+    label: 'DeepSeek Chat',
+    description: 'DeepSeek API in OpenAI-compatible chat format.',
+    config: {
+      endpoint: 'https://api.deepseek.com/v1/chat/completions',
+      model: 'deepseek-chat'
+    }
+  },
+  {
+    id: 'claude-proxy',
+    label: 'Claude (via your proxy)',
+    description: 'Use your own backend proxy that normalizes Claude responses to OpenAI format.',
+    config: {
+      endpoint: '/api/claude/v1/chat/completions',
+      model: 'claude-3-5-sonnet-latest'
+    }
+  },
+  {
+    id: 'amazon-bedrock-proxy',
+    label: 'Amazon Bedrock (via your proxy)',
+    description: 'Use a Bedrock proxy endpoint that accepts OpenAI-style payloads.',
+    config: {
+      endpoint: '/api/bedrock/v1/chat/completions',
+      model: 'anthropic.claude-3-5-sonnet-20240620-v1:0'
+    }
+  },
+  {
+    id: 'sarvam-proxy',
+    label: 'Sarvam AI (via your proxy)',
+    description: 'Use a Sarvam-compatible proxy endpoint for normalized chat output.',
+    config: {
+      endpoint: '/api/sarvam/v1/chat/completions',
+      model: 'sarvam-m'
+    }
+  }
+];
+
+const DEFAULT_MODEL_OPTIONS = [
+  'gpt-4o-mini',
+  'gpt-4.1-mini',
+  'llama3.2:3b',
+  'gemini-1.5-flash',
+  'llama-3.1-8b-instant',
+  'deepseek-chat',
+  'claude-3-5-sonnet-latest'
+];
+
+const DEFAULT_ADMIN_CONFIG = {
+  allowRuntimeConfig: false,
+  persistRuntimeConfig: false,
+  storageKey: 'ai-text-assistant-plugin:runtime-ai-config',
+  exposeApiKeyField: false,
+  editableRuntimeFields: ['providerPreset', 'endpoint', 'model', 'systemPrompt'],
+  providerPresets: DEFAULT_PROVIDER_PRESETS,
+  allowedEndpoints: [],
+  modelOptions: DEFAULT_MODEL_OPTIONS
+};
+
+const DEFAULT_BRANDING = {
+  title: 'AI Text Assistant',
+  configButtonLabel: '⚙️ Settings'
+};
+
+const DEFAULT_UI_CONFIG = {
+  theme: 'default',
+  density: 'comfortable'
+};
+
+const STYLE_ID = 'ai-text-assistant-plugin-style';
 const BASE_STYLES = `
 .voice-assist-plugin-container {
   position: absolute;
   z-index: 99999;
-  width: 320px;
+  width: 340px;
   max-width: 90vw;
   border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: 12px;
@@ -165,7 +287,8 @@ const BASE_STYLES = `
 }
 
 .voice-assist-plugin-config input,
-.voice-assist-plugin-config textarea {
+.voice-assist-plugin-config textarea,
+.voice-assist-plugin-config select {
   border-radius: 8px;
   border: 1px solid #cbd5f5;
   padding: 0.45rem 0.6rem;
@@ -184,6 +307,127 @@ const BASE_STYLES = `
   gap: 0.5rem;
 }
 
+
+
+.voice-assist-plugin-container.theme-slate {
+  background: #0f172a;
+  color: #e2e8f0;
+  border-color: rgba(148, 163, 184, 0.45);
+}
+
+.voice-assist-plugin-container.theme-slate .voice-assist-plugin-header {
+  background: linear-gradient(135deg, #0ea5e9, #6366f1);
+}
+
+.voice-assist-plugin-container.theme-slate .voice-assist-plugin-section h3,
+.voice-assist-plugin-container.theme-slate .voice-assist-plugin-config label,
+.voice-assist-plugin-container.theme-slate .voice-assist-plugin-status {
+  color: #94a3b8;
+}
+
+.voice-assist-plugin-container.theme-slate .voice-assist-plugin-button {
+  background: #1e293b;
+  color: #e2e8f0;
+}
+
+.voice-assist-plugin-container.theme-slate .voice-assist-plugin-button:hover {
+  background: #334155;
+}
+
+.voice-assist-plugin-container.theme-high-contrast {
+  border-color: #111827;
+}
+
+.voice-assist-plugin-container.theme-high-contrast .voice-assist-plugin-header {
+  background: linear-gradient(135deg, #111827, #000000);
+}
+
+.voice-assist-plugin-container.theme-high-contrast .voice-assist-plugin-button.primary {
+  background: #000000;
+}
+
+.voice-assist-plugin-container.density-compact .voice-assist-plugin-body {
+  padding: 0.6rem 0.75rem 0.75rem;
+  gap: 0.55rem;
+}
+
+.voice-assist-plugin-container.density-compact .voice-assist-plugin-button {
+  padding: 0.35rem 0.7rem;
+  font-size: 0.75rem;
+}
+
+.voice-assist-plugin-section {
+  background: rgba(148, 163, 184, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 10px;
+  padding: 0.55rem;
+}
+
+
+
+.voice-assist-selection-popup {
+  position: absolute;
+  z-index: 100000;
+  display: none;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem;
+  border-radius: 14px;
+  border: 1px solid rgba(126, 146, 255, 0.35);
+  background: linear-gradient(180deg, rgba(18, 26, 58, 0.96), rgba(13, 20, 45, 0.96));
+  color: #f8fafc;
+  box-shadow: 0 14px 40px rgba(2, 6, 23, 0.45);
+  backdrop-filter: blur(6px);
+}
+
+.voice-assist-selection-popup.open {
+  display: inline-flex;
+}
+
+.voice-assist-selection-popup::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  left: 50%;
+  bottom: -7px;
+  transform: translateX(-50%) rotate(45deg);
+  background: rgba(13, 20, 45, 0.96);
+  border-right: 1px solid rgba(126, 146, 255, 0.35);
+  border-bottom: 1px solid rgba(126, 146, 255, 0.35);
+}
+
+.voice-assist-selection-popup .actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.voice-assist-selection-popup .divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(148, 163, 184, 0.35);
+  margin: 0 0.05rem;
+}
+
+.voice-assist-selection-popup .actions button {
+  border: none;
+  border-radius: 10px;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #e2e8f0;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.voice-assist-selection-popup .actions button:hover {
+  background: rgba(99, 102, 241, 0.25);
+  color: #ffffff;
+}
 @keyframes va-fade-in {
   from { opacity: 0; transform: scale(0.97); }
   to { opacity: 1; transform: scale(1); }
@@ -209,6 +453,44 @@ function mergeSpeechConfig(baseConfig = {}, patch = {}) {
     merged.insertionMode = 'append';
   }
   return merged;
+}
+
+
+
+function mergeAdminConfig(adminConfig = {}) {
+  const merged = { ...DEFAULT_ADMIN_CONFIG, ...(adminConfig || {}) };
+  if (!Array.isArray(merged.editableRuntimeFields) || !merged.editableRuntimeFields.length) {
+    merged.editableRuntimeFields = DEFAULT_ADMIN_CONFIG.editableRuntimeFields.slice();
+  }
+  if (!Array.isArray(merged.providerPresets) || !merged.providerPresets.length) {
+    merged.providerPresets = DEFAULT_ADMIN_CONFIG.providerPresets.slice();
+  }
+  return merged;
+}
+
+function pickRuntimeConfig(aiConfig, editableFields = []) {
+  const snapshot = {};
+  editableFields.forEach((field) => {
+    if (field in aiConfig) {
+      snapshot[field] = aiConfig[field];
+    }
+  });
+  return snapshot;
+}
+
+function normalizeAllowedEndpoints(allowedEndpoints = []) {
+  if (!Array.isArray(allowedEndpoints)) return [];
+  return allowedEndpoints
+    .filter((value) => typeof value === 'string')
+    .map((value) => value.trim())
+    .filter(Boolean);
+}
+
+function isEndpointAllowed(endpoint, allowedEndpoints = []) {
+  const normalizedAllowed = normalizeAllowedEndpoints(allowedEndpoints);
+  if (!normalizedAllowed.length) return true;
+  if (!endpoint || typeof endpoint !== 'string') return false;
+  return normalizedAllowed.some((allowed) => endpoint.startsWith(allowed));
 }
 
 function ensureStyles() {
@@ -446,6 +728,9 @@ class AssistUI {
     this.configForm = null;
     this.speechButton = null;
     this.speechStopButton = null;
+    this.readAloudButton = null;
+    this.stopReadAloudButton = null;
+    this.summarizeSelectionButton = null;
     this.resizeObserver = null;
     this.observedElement = null;
     this.isVisible = false;
@@ -457,28 +742,31 @@ class AssistUI {
   createUI() {
     if (typeof document === 'undefined') return;
     this.container = document.createElement('div');
-    this.container.className = 'voice-assist-plugin-container';
+    const uiConfig = this.plugin.getUiConfig();
+    this.container.className = `voice-assist-plugin-container theme-${uiConfig.theme} density-${uiConfig.density}`;
     this.container.tabIndex = -1;
 
     const header = document.createElement('div');
     header.className = 'voice-assist-plugin-header';
     const title = document.createElement('h2');
-    title.textContent = 'Voice & AI Assistant';
+    title.textContent = this.plugin.getBranding().title;
     header.appendChild(title);
 
     const headerButtons = document.createElement('div');
     headerButtons.className = 'voice-assist-plugin-header-buttons';
 
-    const configToggle = document.createElement('button');
-    configToggle.type = 'button';
-    configToggle.className = 'voice-assist-plugin-button';
-    configToggle.title = 'Configure AI model';
-    configToggle.innerHTML = '⚙️ Config';
-    configToggle.addEventListener('click', () => {
-      this.toggleConfig();
-    });
-
-    headerButtons.appendChild(configToggle);
+    const canShowConfig = this.plugin.isRuntimeConfigAllowed();
+    if (canShowConfig) {
+      const configToggle = document.createElement('button');
+      configToggle.type = 'button';
+      configToggle.className = 'voice-assist-plugin-button';
+      configToggle.title = 'Configure AI model';
+      configToggle.innerHTML = this.plugin.getBranding().configButtonLabel;
+      configToggle.addEventListener('click', () => {
+        this.toggleConfig();
+      });
+      headerButtons.appendChild(configToggle);
+    }
 
     header.appendChild(headerButtons);
 
@@ -530,6 +818,46 @@ class AssistUI {
     this.promptButtonsWrapper.className = 'voice-assist-plugin-actions';
     aiSection.appendChild(this.promptButtonsWrapper);
 
+    const selectionSection = document.createElement('div');
+    selectionSection.className = 'voice-assist-plugin-section';
+    const selectionTitle = document.createElement('h3');
+    selectionTitle.textContent = 'Selection tools';
+    selectionSection.appendChild(selectionTitle);
+    const selectionActions = document.createElement('div');
+    selectionActions.className = 'voice-assist-plugin-actions';
+
+    this.readAloudButton = document.createElement('button');
+    this.readAloudButton.type = 'button';
+    this.readAloudButton.className = 'voice-assist-plugin-button';
+    this.readAloudButton.textContent = '🔊 Read selection';
+
+    this.stopReadAloudButton = document.createElement('button');
+    this.stopReadAloudButton.type = 'button';
+    this.stopReadAloudButton.className = 'voice-assist-plugin-button';
+    this.stopReadAloudButton.textContent = '⏹ Stop reading';
+    this.stopReadAloudButton.disabled = true;
+
+    this.summarizeSelectionButton = document.createElement('button');
+    this.summarizeSelectionButton.type = 'button';
+    this.summarizeSelectionButton.className = 'voice-assist-plugin-button primary';
+    this.summarizeSelectionButton.textContent = '✨ Summarize selection';
+
+    this.readAloudButton.addEventListener('click', () => this.plugin.readSelectionAloud());
+    this.stopReadAloudButton.addEventListener('click', () => this.plugin.stopReadAloud());
+    this.summarizeSelectionButton.addEventListener('click', () => this.plugin.summarizeSelection());
+
+    const speechSynthesisSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
+    if (!speechSynthesisSupported) {
+      this.readAloudButton.disabled = true;
+      this.readAloudButton.textContent = '🔊 Not supported';
+      this.stopReadAloudButton.disabled = true;
+    }
+
+    selectionActions.appendChild(this.readAloudButton);
+    selectionActions.appendChild(this.stopReadAloudButton);
+    selectionActions.appendChild(this.summarizeSelectionButton);
+    selectionSection.appendChild(selectionActions);
+
     const status = document.createElement('div');
     status.className = 'voice-assist-plugin-status';
     this.statusNode = status;
@@ -538,15 +866,30 @@ class AssistUI {
     this.configSection.className = 'voice-assist-plugin-config';
     this.configForm = document.createElement('form');
 
-    const endpointField = this.createLabeledInput('Endpoint URL', 'text', 'endpoint');
-    const apiKeyField = this.createLabeledInput('API key (optional)', 'text', 'apiKey');
-    const modelField = this.createLabeledInput('Model name', 'text', 'model');
-    const systemPromptField = this.createLabeledTextarea('System prompt (optional)', 'systemPrompt');
+    const editableFields = this.plugin.getEditableRuntimeFields();
+    const providerPresets = this.plugin.getProviderPresets();
 
-    this.configForm.appendChild(endpointField);
-    this.configForm.appendChild(apiKeyField);
-    this.configForm.appendChild(modelField);
-    this.configForm.appendChild(systemPromptField);
+    if (editableFields.includes('providerPreset')) {
+      const providerField = this.createProviderPresetField(providerPresets);
+      this.configForm.appendChild(providerField);
+    }
+    if (editableFields.includes('endpoint')) {
+      this.configForm.appendChild(this.createLabeledInput('Endpoint URL', 'text', 'endpoint'));
+    }
+    if (editableFields.includes('apiKey') && this.plugin.shouldExposeApiKeyField()) {
+      this.configForm.appendChild(this.createLabeledInput('API key', 'text', 'apiKey'));
+    }
+    if (editableFields.includes('model')) {
+      const modelOptions = this.plugin.getModelOptions();
+      if (Array.isArray(modelOptions) && modelOptions.length) {
+        this.configForm.appendChild(this.createLabeledSelect('Model', 'model', modelOptions));
+      } else {
+        this.configForm.appendChild(this.createLabeledInput('Model name', 'text', 'model'));
+      }
+    }
+    if (editableFields.includes('systemPrompt')) {
+      this.configForm.appendChild(this.createLabeledTextarea('System prompt', 'systemPrompt'));
+    }
 
     const configActions = document.createElement('div');
     configActions.className = 'voice-assist-plugin-config-actions';
@@ -568,22 +911,24 @@ class AssistUI {
     this.configForm.addEventListener('submit', (event) => {
       event.preventDefault();
       const formData = new FormData(this.configForm);
-      const nextConfig = {
-        ...this.plugin.getAIConfig(),
-        endpoint: formData.get('endpoint') || '',
-        apiKey: formData.get('apiKey') || '',
-        model: formData.get('model') || '',
-        systemPrompt: formData.get('systemPrompt') || ''
-      };
-      this.plugin.setAIConfig(nextConfig);
-      this.toggleConfig(false);
-      this.setStatus('AI configuration updated.', 'success');
+      try {
+        const nextConfig = this.plugin.readRuntimeConfigFromForm(formData);
+        this.plugin.setRuntimeAIConfig(nextConfig);
+        this.toggleConfig(false);
+        this.setStatus('AI configuration updated.', 'success');
+      } catch (error) {
+        this.setStatus(error.message, 'error');
+      }
     });
 
     this.configSection.appendChild(this.configForm);
+    if (!this.plugin.isRuntimeConfigAllowed()) {
+      this.configSection.style.display = 'none';
+    }
 
     body.appendChild(speechSection);
     body.appendChild(aiSection);
+    body.appendChild(selectionSection);
     body.appendChild(status);
     body.appendChild(this.configSection);
 
@@ -626,6 +971,28 @@ class AssistUI {
     return wrapper;
   }
 
+  createProviderPresetField(presets = []) {
+    const wrapper = document.createElement('label');
+    wrapper.textContent = 'Provider preset';
+    const select = document.createElement('select');
+    select.name = 'providerPreset';
+
+    const customOption = document.createElement('option');
+    customOption.value = '';
+    customOption.textContent = 'Custom';
+    select.appendChild(customOption);
+
+    presets.forEach((preset) => {
+      const option = document.createElement('option');
+      option.value = preset.id;
+      option.textContent = preset.label;
+      select.appendChild(option);
+    });
+
+    wrapper.appendChild(select);
+    return wrapper;
+  }
+
   toggleConfig(force) {
     if (!this.configSection) return;
     const shouldOpen = typeof force === 'boolean' ? force : !this.configSection.classList.contains('open');
@@ -639,11 +1006,13 @@ class AssistUI {
 
   syncConfigForm(config) {
     if (!this.configForm) return;
+    const providerPreset = this.configForm.querySelector('select[name="providerPreset"]');
     const endpoint = this.configForm.querySelector('input[name="endpoint"]');
     const apiKey = this.configForm.querySelector('input[name="apiKey"]');
-    const model = this.configForm.querySelector('input[name="model"]');
+    const model = this.configForm.querySelector('[name="model"]');
     const systemPrompt = this.configForm.querySelector('textarea[name="systemPrompt"]');
 
+    if (providerPreset) providerPreset.value = config.providerPreset || '';
     if (endpoint) endpoint.value = config.endpoint || '';
     if (apiKey) apiKey.value = config.apiKey || '';
     if (model) model.value = config.model || '';
@@ -742,6 +1111,13 @@ class AssistUI {
     }
   }
 
+  setReadAloudState(active) {
+    if (!this.readAloudButton || !this.stopReadAloudButton) return;
+    this.readAloudButton.disabled = active;
+    this.stopReadAloudButton.disabled = !active;
+    this.readAloudButton.textContent = active ? '🔊 Reading…' : '🔊 Read selection';
+  }
+
   setSpeechCapturing(active) {
     if (!this.speechButton || !this.speechStopButton) return;
     if (!this.speechSupported) {
@@ -779,6 +1155,115 @@ class AssistUI {
   }
 }
 
+
+class SelectionActionPopup {
+  constructor(plugin) {
+    this.plugin = plugin;
+    this.container = null;
+    this.lastResult = '';
+    this.create();
+  }
+
+  create() {
+    if (typeof document === 'undefined') return;
+    const container = document.createElement('div');
+    container.className = 'voice-assist-selection-popup';
+
+    const actions = document.createElement('div');
+    actions.className = 'actions';
+
+    const readBtn = document.createElement('button');
+    readBtn.type = 'button';
+    readBtn.title = 'Read aloud';
+    readBtn.setAttribute('aria-label', 'Read aloud');
+    readBtn.textContent = '🔊';
+    readBtn.addEventListener('click', () => this.plugin.readWindowSelectionAloud());
+
+    const copyBtn = document.createElement('button');
+    copyBtn.type = 'button';
+    copyBtn.title = 'Copy result';
+    copyBtn.setAttribute('aria-label', 'Copy result');
+    copyBtn.textContent = '📋';
+    copyBtn.addEventListener('click', () => this.copyResult());
+
+    const grammarBtn = document.createElement('button');
+    grammarBtn.type = 'button';
+    grammarBtn.title = 'Grammar check';
+    grammarBtn.setAttribute('aria-label', 'Grammar check');
+    grammarBtn.textContent = '📝';
+    grammarBtn.addEventListener('click', () => this.plugin.grammarCheckWindowSelection());
+
+    const summarizeBtn = document.createElement('button');
+    summarizeBtn.type = 'button';
+    summarizeBtn.title = 'Summarize';
+    summarizeBtn.setAttribute('aria-label', 'Summarize');
+    summarizeBtn.textContent = '✨';
+    summarizeBtn.addEventListener('click', () => this.plugin.summarizeWindowSelection());
+
+    actions.appendChild(readBtn);
+    const divider = document.createElement('span');
+    divider.className = 'divider';
+    actions.appendChild(divider);
+    actions.appendChild(copyBtn);
+    actions.appendChild(grammarBtn);
+    actions.appendChild(summarizeBtn);
+
+    container.appendChild(actions);
+    document.body.appendChild(container);
+    this.container = container;
+  }
+
+  showAt(rect) {
+    if (!this.container || !rect) return;
+    this.container.classList.add('open');
+
+    const toolbarWidth = this.container.offsetWidth || 220;
+    const desiredLeft = rect.left + window.scrollX + (rect.width / 2) - (toolbarWidth / 2);
+    const left = Math.min(
+      Math.max(12, desiredLeft),
+      window.scrollX + window.innerWidth - toolbarWidth - 12
+    );
+
+    const top = Math.max(12, rect.top + window.scrollY - this.container.offsetHeight - 10);
+    this.container.style.top = `${top}px`;
+    this.container.style.left = `${left}px`;
+  }
+
+  hide() {
+    if (!this.container) return;
+    this.container.classList.remove('open');
+  }
+
+  setResult(text) {
+    this.lastResult = text || '';
+  }
+
+  async copyResult() {
+    const text = this.lastResult || this.plugin.getWindowSelectionText();
+    if (!text) {
+      this.plugin.ensureUI().setStatus('Nothing to copy yet. Run grammar or summarize first.', 'error');
+      return;
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+      this.plugin.ensureUI().setStatus('Copied to clipboard.', 'success');
+    }
+  }
+
+  contains(node) {
+    return Boolean(this.container && node && this.container.contains(node));
+  }
+
+  destroy() {
+    if (this.container?.parentNode) {
+      this.container.parentNode.removeChild(this.container);
+    }
+    this.container = null;
+    this.lastResult = '';
+  }
+}
+
+
 export class VoiceAssistPlugin {
   constructor(options = {}) {
     if (typeof window === 'undefined' || typeof document === 'undefined') {
@@ -786,7 +1271,15 @@ export class VoiceAssistPlugin {
     }
     this.options = options;
     this.prompts = Array.isArray(options.prompts) ? options.prompts : DEFAULT_PROMPTS.slice();
-    this.aiConfig = { ...DEFAULT_AI_CONFIG, ...(options.aiConfig || {}) };
+    this.branding = { ...DEFAULT_BRANDING, ...(options.branding || {}) };
+    this.uiConfig = { ...DEFAULT_UI_CONFIG, ...(options.uiConfig || {}) };
+    this.adminConfig = mergeAdminConfig(options.adminConfig);
+    this.aiConfig = {
+      ...DEFAULT_AI_CONFIG,
+      ...(options.aiConfig || {}),
+      ...this.readPersistedRuntimeConfig()
+    };
+    this.assertAllowedEndpoint(this.aiConfig.endpoint);
     const defaultSpeechConfig = {
       locale: 'en-US',
       interimResults: false,
@@ -796,21 +1289,127 @@ export class VoiceAssistPlugin {
     this.aiInsertionMode = options.aiInsertionMode || 'replace-selection';
     this.activeElement = null;
     this.ui = null;
+    this.selectionPopup = null;
     this.root = options.root || document;
     this.autoAttach = options.autoAttach !== false;
     this.isListening = false;
     this.recognition = null;
     this.pendingAiAbortController = null;
     this.isAttached = false;
+    this.isReadingAloud = false;
 
     this.onFocusIn = this.onFocusIn.bind(this);
     this.onFocusOut = this.onFocusOut.bind(this);
     this.onWindowChange = this.onWindowChange.bind(this);
     this.onDocumentClick = this.onDocumentClick.bind(this);
+    this.onSelectionChange = this.onSelectionChange.bind(this);
+
+    if (this.aiConfig.providerPreset) {
+      this.applyProviderPreset(this.aiConfig.providerPreset);
+    }
 
     if (this.autoAttach) {
       this.attach();
     }
+  }
+
+  getBranding() {
+    return { ...this.branding };
+  }
+
+  getUiConfig() {
+    return { ...this.uiConfig };
+  }
+
+  isRuntimeConfigAllowed() {
+    return Boolean(this.adminConfig.allowRuntimeConfig);
+  }
+
+  shouldExposeApiKeyField() {
+    return Boolean(this.adminConfig.exposeApiKeyField);
+  }
+
+  getEditableRuntimeFields() {
+    return this.adminConfig.editableRuntimeFields.slice();
+  }
+
+  getProviderPresets() {
+    return this.adminConfig.providerPresets.slice();
+  }
+
+  getModelOptions() {
+    const modelOptions = this.adminConfig.modelOptions;
+    return Array.isArray(modelOptions) ? modelOptions.slice() : [];
+  }
+
+  applyProviderPreset(presetId) {
+    if (!presetId) return;
+    const preset = this.adminConfig.providerPresets.find((item) => item.id === presetId);
+    if (!preset || !preset.config) return;
+    this.aiConfig = { ...this.aiConfig, ...preset.config, providerPreset: preset.id };
+  }
+
+  assertAllowedEndpoint(endpoint) {
+    if (isEndpointAllowed(endpoint, this.adminConfig.allowedEndpoints)) return;
+    const allowlist = normalizeAllowedEndpoints(this.adminConfig.allowedEndpoints);
+    throw new Error(`Endpoint is not allowed. Allowed prefixes: ${allowlist.join(', ')}`);
+  }
+
+  readRuntimeConfigFromForm(formData) {
+    const editableFields = this.getEditableRuntimeFields();
+    const nextConfig = {};
+    const providerPreset = String(formData.get('providerPreset') || '');
+    if (editableFields.includes('providerPreset')) {
+      nextConfig.providerPreset = providerPreset;
+      if (providerPreset) {
+        const preset = this.adminConfig.providerPresets.find((item) => item.id === providerPreset);
+        if (preset && preset.config) {
+          Object.assign(nextConfig, preset.config);
+        }
+      }
+    }
+    editableFields.forEach((field) => {
+      if (field === 'providerPreset') return;
+      const value = formData.get(field);
+      if (typeof value === 'string') {
+        nextConfig[field] = value;
+      }
+    });
+    this.assertAllowedEndpoint((nextConfig.endpoint ?? this.aiConfig.endpoint));
+    return nextConfig;
+  }
+
+  readPersistedRuntimeConfig() {
+    if (!this.adminConfig.persistRuntimeConfig) return {};
+    if (typeof window === 'undefined' || !window.localStorage) return {};
+    try {
+      const raw = window.localStorage.getItem(this.adminConfig.storageKey);
+      if (!raw) return {};
+      const parsed = JSON.parse(raw);
+      const runtimeConfig = pickRuntimeConfig(parsed, this.getEditableRuntimeFields());
+      if ('endpoint' in runtimeConfig) {
+        this.assertAllowedEndpoint(runtimeConfig.endpoint);
+      }
+      return runtimeConfig;
+    } catch (error) {
+      return {};
+    }
+  }
+
+  persistRuntimeConfig() {
+    if (!this.adminConfig.persistRuntimeConfig) return;
+    if (typeof window === 'undefined' || !window.localStorage) return;
+    const snapshot = pickRuntimeConfig(this.aiConfig, this.getEditableRuntimeFields());
+    try {
+      window.localStorage.setItem(this.adminConfig.storageKey, JSON.stringify(snapshot));
+    } catch (error) {
+      // ignore storage errors
+    }
+  }
+
+  setRuntimeAIConfig(nextConfig = {}) {
+    this.setAIConfig(nextConfig);
+    this.persistRuntimeConfig();
   }
 
   attach() {
@@ -820,6 +1419,7 @@ export class VoiceAssistPlugin {
     window.addEventListener('resize', this.onWindowChange);
     document.addEventListener('scroll', this.onWindowChange, true);
     document.addEventListener('click', this.onDocumentClick);
+    document.addEventListener('selectionchange', this.onSelectionChange);
     this.isAttached = true;
   }
 
@@ -830,12 +1430,15 @@ export class VoiceAssistPlugin {
     window.removeEventListener('resize', this.onWindowChange);
     document.removeEventListener('scroll', this.onWindowChange, true);
     document.removeEventListener('click', this.onDocumentClick);
+    document.removeEventListener('selectionchange', this.onSelectionChange);
     this.isAttached = false;
+    this.isReadingAloud = false;
   }
 
   destroy() {
     this.detach();
     this.stopSpeechCapture();
+    this.stopReadAloud();
     if (this.pendingAiAbortController) {
       this.pendingAiAbortController.abort();
       this.pendingAiAbortController = null;
@@ -843,6 +1446,7 @@ export class VoiceAssistPlugin {
     if (this.ui) {
       this.ui.destroy();
       this.ui = null;
+    this.selectionPopup = null;
     }
     this.activeElement = null;
   }
@@ -852,6 +1456,14 @@ export class VoiceAssistPlugin {
       this.ui = new AssistUI(this);
     }
     return this.ui;
+  }
+
+
+  ensureSelectionPopup() {
+    if (!this.selectionPopup) {
+      this.selectionPopup = new SelectionActionPopup(this);
+    }
+    return this.selectionPopup;
   }
 
   onFocusIn(event) {
@@ -884,11 +1496,157 @@ export class VoiceAssistPlugin {
   }
 
   onDocumentClick(event) {
+    if (this.selectionPopup && this.selectionPopup.contains(event.target)) return;
+    if (this.selectionPopup && !this.getWindowSelectionText()) {
+      this.selectionPopup.hide();
+    }
     if (!this.ui || !this.ui.container) return;
     if (!this.ui.isVisible) return;
     if (this.ui.container.contains(event.target)) return;
     if (this.activeElement && this.activeElement.contains && this.activeElement.contains(event.target)) return;
     this.ui.hide();
+  }
+
+
+  onSelectionChange() {
+    const text = this.getWindowSelectionText();
+    if (!text) {
+      if (this.selectionPopup) this.selectionPopup.hide();
+      return;
+    }
+    const rect = this.getWindowSelectionRect();
+    if (!rect) return;
+    this.ensureSelectionPopup().showAt(rect);
+  }
+
+  getWindowSelectionText() {
+    if (typeof window === 'undefined' || !window.getSelection) return '';
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return '';
+    return selection.toString().trim();
+  }
+
+  getWindowSelectionRect() {
+    if (typeof window === 'undefined' || !window.getSelection) return null;
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return null;
+    const range = selection.getRangeAt(0);
+    return range.getBoundingClientRect();
+  }
+
+  readWindowSelectionAloud() {
+    const text = this.getWindowSelectionText();
+    this.readTextAloud(text, 'Select text first, then use Read aloud.');
+  }
+
+  grammarCheckWindowSelection() {
+    const text = this.getWindowSelectionText();
+    this.runAiOnWindowSelection({
+      text,
+      label: 'Grammar check',
+      instruction: 'Fix grammar and spelling in the selected text while preserving original meaning.'
+    });
+  }
+
+  summarizeWindowSelection() {
+    const text = this.getWindowSelectionText();
+    this.runAiOnWindowSelection({
+      text,
+      label: 'Summarize',
+      instruction: 'Summarize the selected text in plain language.'
+    });
+  }
+
+  readTextAloud(text, emptyMessage) {
+    if (!text) {
+      this.ensureUI().setStatus(emptyMessage, 'error');
+      return;
+    }
+    if (typeof window === 'undefined' || !window.speechSynthesis) {
+      this.ensureUI().setStatus('Read aloud is not supported in this browser.', 'error');
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = this.speechConfig.locale || 'en-US';
+    utterance.onstart = () => {
+      this.isReadingAloud = true;
+      if (this.ui) this.ui.setReadAloudState(true);
+      this.ensureUI().setStatus('Reading selected text…');
+    };
+    utterance.onend = () => {
+      this.isReadingAloud = false;
+      if (this.ui) this.ui.setReadAloudState(false);
+      this.ensureUI().setStatus('Finished reading selection.', 'success');
+    };
+    utterance.onerror = () => {
+      this.isReadingAloud = false;
+      if (this.ui) this.ui.setReadAloudState(false);
+      this.ensureUI().setStatus('Unable to read selection.', 'error');
+    };
+
+    window.speechSynthesis.speak(utterance);
+  }
+
+  async runAiOnWindowSelection({ text, label, instruction }) {
+    if (!text) {
+      this.ensureUI().setStatus('Select text first.', 'error');
+      return;
+    }
+    this.ensureUI().setStatus(`Running “${label}”…`);
+    const controller = new AbortController();
+    this.pendingAiAbortController = controller;
+    try {
+      const requestHandler = typeof this.options.aiRequest === 'function' ? this.options.aiRequest : defaultAiRequest;
+      const aiResponse = await requestHandler({
+        text,
+        instruction,
+        config: this.aiConfig,
+        signal: controller.signal,
+        prompt: { id: label.toLowerCase().replace(/\s+/g, '-'), label, instruction }
+      });
+      this.ensureSelectionPopup().setResult(aiResponse);
+      this.ensureUI().setStatus(`${label} completed.`, 'success');
+    } catch (error) {
+      this.ensureUI().setStatus(error.message, 'error');
+    } finally {
+      if (this.pendingAiAbortController === controller) this.pendingAiAbortController = null;
+    }
+  }
+
+  getSelectedText() {
+    if (!this.activeElement) return '';
+    const selection = getActiveSelection(this.activeElement);
+    return (selection.text || '').trim();
+  }
+
+  readSelectionAloud() {
+    const text = this.getSelectedText();
+    this.readTextAloud(text, 'Select text first, then use Read selection.');
+  }
+
+  stopReadAloud() {
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    this.isReadingAloud = false;
+    if (this.ui) {
+      this.ui.setReadAloudState(false);
+    }
+  }
+
+  summarizeSelection() {
+    const selectedText = this.getSelectedText();
+    if (!selectedText) {
+      this.ensureUI().setStatus('Select text first, then use Summarize selection.', 'error');
+      return;
+    }
+    this.runAiAction({
+      id: 'summarize-selection',
+      label: 'Summarize selection',
+      instruction: 'Summarize the selected text in plain language for a broad audience.'
+    });
   }
 
   startSpeechCapture() {
@@ -967,7 +1725,9 @@ export class VoiceAssistPlugin {
   }
 
   setAIConfig(nextConfig = {}) {
-    this.aiConfig = { ...this.aiConfig, ...nextConfig };
+    const candidate = { ...this.aiConfig, ...nextConfig };
+    this.assertAllowedEndpoint(candidate.endpoint);
+    this.aiConfig = candidate;
     if (this.ui) {
       this.ui.syncConfigForm(this.aiConfig);
     }
@@ -1061,4 +1821,4 @@ export class VoiceAssistPlugin {
 }
 
 export default VoiceAssistPlugin;
-export { DEFAULT_PROMPTS, DEFAULT_AI_CONFIG, defaultAiRequest };
+export { DEFAULT_PROMPTS, DEFAULT_AI_CONFIG, DEFAULT_ADMIN_CONFIG, DEFAULT_PROVIDER_PRESETS, DEFAULT_BRANDING, DEFAULT_UI_CONFIG, isEndpointAllowed, defaultAiRequest };
