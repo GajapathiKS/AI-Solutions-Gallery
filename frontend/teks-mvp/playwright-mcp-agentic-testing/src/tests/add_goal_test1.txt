@@ -1,8 +1,0 @@
-Create a new goal with these details:
-- Description: 1Gaja 2356 Improve reading comprehension skills through daily practice
-- Category: Academic Achievement
-- Measurement: Weekly assessment scores will increase by 10% each month
-- Owner: Mrs. Rodriguez
-- Target Date: 2025-06-30
-
-After filling all fields, click the Create button to submit the form.

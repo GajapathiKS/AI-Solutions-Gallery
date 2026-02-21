@@ -1,1 +1,0 @@
-Verify that the newly created needs assessment appears in the list. Look for the assessment that was just created.

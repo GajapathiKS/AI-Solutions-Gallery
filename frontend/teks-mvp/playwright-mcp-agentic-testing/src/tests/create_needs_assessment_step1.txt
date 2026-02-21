@@ -1,5 +1,0 @@
-Wait for the students table to load (it appears under "Active Students" heading).
-
-Once loaded, find the table row containing Local ID "GL245671" and click the "Open" button in that row.
-
-The Open button should be visible in the same row as the student record.
