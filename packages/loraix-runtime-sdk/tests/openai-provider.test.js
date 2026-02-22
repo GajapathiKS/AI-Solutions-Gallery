@@ -30,3 +30,42 @@ test('OpenAIProvider throws for non-ok responses', async () => {
 
   await assert.rejects(provider.generate({ model: 'm', messages: [] }));
 });
+
+test('OpenAIProvider stream parses CRLF-delimited SSE frames', async () => {
+  const encoder = new TextEncoder();
+  const chunks = [
+    encoder.encode('data: {"choices":[{"delta":{"content":"He"}}]}\r\n\r\n'),
+    encoder.encode('data: {"choices":[{"delta":{"content":"llo"}}]}\r\n\r\n'),
+    encoder.encode('data: [DONE]\r\n\r\n')
+  ];
+
+  const provider = new OpenAIProvider({
+    apiKey: 'k',
+    fetchImpl: async () => ({
+      ok: true,
+      body: {
+        getReader() {
+          let i = 0;
+          return {
+            async read() {
+              if (i >= chunks.length) {
+                return { done: true, value: undefined };
+              }
+              const value = chunks[i];
+              i += 1;
+              return { done: false, value };
+            }
+          };
+        }
+      }
+    })
+  });
+
+  const iterable = await provider.stream({ model: 'm', messages: [] });
+  let text = '';
+  for await (const chunk of iterable) {
+    text += chunk;
+  }
+
+  assert.equal(text, 'Hello');
+});

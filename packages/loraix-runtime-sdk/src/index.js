@@ -29,6 +29,22 @@ function toMessages(input) {
   throw new LoraixRuntimeError('Invalid input. Expected prompt string or { messages }.');
 }
 
+function mergeCallOptions(input, options = {}) {
+  if (input && typeof input === 'object' && !Array.isArray(input)) {
+    const {
+      messages: _messages,
+      ...inputOptions
+    } = input;
+
+    return {
+      ...inputOptions,
+      ...options
+    };
+  }
+
+  return options;
+}
+
 function shouldRetry(error) {
   if (!error) {
     return false;
@@ -145,19 +161,20 @@ export class LoraixRuntime {
   }
 
   async generate(input, options = {}) {
+    const mergedOptions = mergeCallOptions(input, options);
     const messages = toMessages(input);
     const req = {
       messages,
-      model: options.model ?? this.config.model,
-      temperature: options.temperature ?? this.config.temperature,
-      maxTokens: options.maxTokens ?? this.config.maxTokens
+      model: mergedOptions.model ?? this.config.model,
+      temperature: mergedOptions.temperature ?? this.config.temperature,
+      maxTokens: mergedOptions.maxTokens ?? this.config.maxTokens
     };
 
     for (const fn of this.config.interceptors.request) {
       await fn(req);
     }
 
-    return this.#runWithProviders(req, options);
+    return this.#runWithProviders(req, mergedOptions);
   }
 
   async json({ prompt, messages, schema, ...options }) {
@@ -194,15 +211,16 @@ export class LoraixRuntime {
   }
 
   async *stream(input, options = {}) {
+    const mergedOptions = mergeCallOptions(input, options);
     const messages = toMessages(input);
     const req = {
       messages,
-      model: options.model ?? this.config.model,
-      temperature: options.temperature ?? this.config.temperature,
-      maxTokens: options.maxTokens ?? this.config.maxTokens
+      model: mergedOptions.model ?? this.config.model,
+      temperature: mergedOptions.temperature ?? this.config.temperature,
+      maxTokens: mergedOptions.maxTokens ?? this.config.maxTokens
     };
 
-    const provider = options.provider ?? this.config.provider;
+    const provider = mergedOptions.provider ?? this.config.provider;
     if (!provider?.stream) {
       throw new LoraixRuntimeError(`Provider ${provider?.name ?? 'unknown'} does not support streaming.`);
     }
@@ -214,10 +232,10 @@ export class LoraixRuntime {
     let streamConn;
     await this.#retry(async ({ attempt }) => {
       streamConn = await withTimeout(
-        provider.stream(req, { timeoutMs: options.timeoutMs ?? this.config.timeoutMs, attempt }),
-        options.timeoutMs ?? this.config.timeoutMs
+        provider.stream(req, { timeoutMs: mergedOptions.timeoutMs ?? this.config.timeoutMs, attempt }),
+        mergedOptions.timeoutMs ?? this.config.timeoutMs
       );
-    }, options);
+    }, mergedOptions);
 
     for await (const chunk of streamConn) {
       yield chunk;
@@ -386,7 +404,7 @@ export class OpenAIProvider {
           }
 
           buffer += decoder.decode(value, { stream: true });
-          const parts = buffer.split('\n\n');
+          const parts = buffer.split(/\r?\n\r?\n/);
           buffer = parts.pop() ?? '';
 
           for (const part of parts) {

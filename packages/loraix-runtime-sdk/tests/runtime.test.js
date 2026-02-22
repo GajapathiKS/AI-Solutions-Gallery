@@ -143,3 +143,28 @@ test('stream yields provider chunks', async () => {
 
   assert.equal(combined, 'ab');
 });
+
+test('generate honors per-call options embedded in object input', async () => {
+  let captured;
+  const ai = new LoraixRuntime({
+    provider: fakeProvider({
+      onGenerate: async (request) => {
+        captured = request;
+        return { text: 'ok' };
+      }
+    }),
+    model: 'default-model',
+    temperature: 0
+  });
+
+  await ai.generate({
+    messages: [{ role: 'user', content: 'hello' }],
+    model: 'override-model',
+    temperature: 0.7,
+    maxTokens: 123
+  });
+
+  assert.equal(captured.model, 'override-model');
+  assert.equal(captured.temperature, 0.7);
+  assert.equal(captured.maxTokens, 123);
+});
