@@ -218,3 +218,46 @@ test('stream times out if stream stalls after setup', async () => {
 
   assert.deepEqual(collected, ['first']);
 });
+
+test('stream timeout calls iterator.return for cleanup', async () => {
+  let returnCalled = false;
+  const iterable = {
+    [Symbol.asyncIterator]() {
+      let idx = 0;
+      return {
+        async next() {
+          if (idx === 0) {
+            idx += 1;
+            return { done: false, value: 'first' };
+          }
+          await new Promise((resolve) => setTimeout(resolve, 50));
+          return { done: false, value: 'second' };
+        },
+        async return() {
+          returnCalled = true;
+          return { done: true, value: undefined };
+        }
+      };
+    }
+  };
+
+  const ai = new LoraixRuntime({
+    provider: fakeProvider({
+      onGenerate: async () => ({ text: '' }),
+      onStream: async () => iterable
+    }),
+    model: 'x',
+    maxRetries: 0
+  });
+
+  await assert.rejects(
+    (async () => {
+      for await (const _chunk of ai.stream('stall', { timeoutMs: 10 })) {
+        // consume until timeout
+      }
+    })(),
+    (error) => error?.timeout === true
+  );
+
+  assert.equal(returnCalled, true);
+});

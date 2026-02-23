@@ -294,10 +294,10 @@ export class LoraixRuntime {
     }, mergedOptions);
 
     const timedStream = withStreamTimeout(streamConn, timeoutMs, {
-      onTimeout: () => {
+      onTimeout: (_err, iterator) => {
         streamController?.abort();
-        if (typeof streamConn?.return === 'function') {
-          streamConn.return();
+        if (typeof iterator?.return === 'function') {
+          iterator.return();
         }
       }
     });
