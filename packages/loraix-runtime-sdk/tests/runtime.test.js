@@ -168,3 +168,53 @@ test('generate honors per-call options embedded in object input', async () => {
   assert.equal(captured.temperature, 0.7);
   assert.equal(captured.maxTokens, 123);
 });
+
+test('generate aborts in-flight provider call when timeout is hit', async () => {
+  let capturedSignal;
+  const ai = new LoraixRuntime({
+    provider: fakeProvider({
+      onGenerate: async (_request, ctx) => {
+        capturedSignal = ctx.signal;
+        return new Promise(() => {});
+      }
+    }),
+    model: 'x',
+    maxRetries: 0
+  });
+
+  await assert.rejects(
+    ai.generate('slow', { timeoutMs: 10 }),
+    (error) => error?.timeout === true
+  );
+
+  assert.equal(capturedSignal.aborted, true);
+});
+
+test('stream times out if stream stalls after setup', async () => {
+  const ai = new LoraixRuntime({
+    provider: fakeProvider({
+      onGenerate: async () => ({ text: '' }),
+      onStream: async () => ({
+        async *[Symbol.asyncIterator]() {
+          yield 'first';
+          await new Promise((resolve) => setTimeout(resolve, 50));
+          yield 'second';
+        }
+      })
+    }),
+    model: 'x',
+    maxRetries: 0
+  });
+
+  const collected = [];
+  await assert.rejects(
+    (async () => {
+      for await (const chunk of ai.stream('stall', { timeoutMs: 10 })) {
+        collected.push(chunk);
+      }
+    })(),
+    (error) => error?.timeout === true
+  );
+
+  assert.deepEqual(collected, ['first']);
+});

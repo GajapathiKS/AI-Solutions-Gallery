@@ -102,19 +102,67 @@ function shallowValidateSchema(json, schema) {
   return true;
 }
 
-function withTimeout(promise, timeoutMs) {
+function createTimeoutError(timeoutMs) {
+  const err = new Error(`Timed out after ${timeoutMs}ms`);
+  err.timeout = true;
+  return err;
+}
+
+function withTimeout(promise, timeoutMs, { onTimeout } = {}) {
   if (!timeoutMs) {
     return promise;
   }
 
+  let timeoutId;
   return Promise.race([
     promise,
     new Promise((_, reject) => {
-      const err = new Error(`Timed out after ${timeoutMs}ms`);
-      err.timeout = true;
-      setTimeout(() => reject(err), timeoutMs);
+      timeoutId = setTimeout(() => {
+        const err = createTimeoutError(timeoutMs);
+        onTimeout?.(err);
+        reject(err);
+      }, timeoutMs);
     })
-  ]);
+  ]).finally(() => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+  });
+}
+
+function withStreamTimeout(iterable, timeoutMs, { onTimeout } = {}) {
+  if (!timeoutMs) {
+    return iterable;
+  }
+
+  const iterator = iterable[Symbol.asyncIterator]();
+  return {
+    async *[Symbol.asyncIterator]() {
+      while (true) {
+        let timeoutId;
+        const nextValue = await Promise.race([
+          iterator.next(),
+          new Promise((_, reject) => {
+            timeoutId = setTimeout(() => {
+              const err = createTimeoutError(timeoutMs);
+              onTimeout?.(err, iterator);
+              reject(err);
+            }, timeoutMs);
+          })
+        ]).finally(() => {
+          if (timeoutId) {
+            clearTimeout(timeoutId);
+          }
+        });
+
+        if (nextValue.done) {
+          return;
+        }
+
+        yield nextValue.value;
+      }
+    }
+  };
 }
 
 export class LoraixRuntimeError extends Error {
@@ -230,14 +278,31 @@ export class LoraixRuntime {
     }
 
     let streamConn;
+    let streamController;
+    const timeoutMs = mergedOptions.timeoutMs ?? this.config.timeoutMs;
     await this.#retry(async ({ attempt }) => {
+      streamController = new AbortController();
       streamConn = await withTimeout(
-        provider.stream(req, { timeoutMs: mergedOptions.timeoutMs ?? this.config.timeoutMs, attempt }),
-        mergedOptions.timeoutMs ?? this.config.timeoutMs
+        provider.stream(req, { timeoutMs, attempt, signal: streamController.signal }),
+        timeoutMs,
+        {
+          onTimeout: () => {
+            streamController.abort();
+          }
+        }
       );
     }, mergedOptions);
 
-    for await (const chunk of streamConn) {
+    const timedStream = withStreamTimeout(streamConn, timeoutMs, {
+      onTimeout: () => {
+        streamController?.abort();
+        if (typeof streamConn?.return === 'function') {
+          streamConn.return();
+        }
+      }
+    });
+
+    for await (const chunk of timedStream) {
       yield chunk;
     }
   }
@@ -252,14 +317,24 @@ export class LoraixRuntime {
       const provider = providers[pIdx];
       try {
         const out = await this.#retry(async ({ attempt }) => {
+          const controller = new AbortController();
           totalAttempts += 1;
           for (const fn of this.config.interceptors.attempt) {
             await fn({ provider: provider.name, attempt, request: req });
           }
 
           return withTimeout(
-            provider.generate(req, { timeoutMs: options.timeoutMs ?? this.config.timeoutMs, attempt }),
-            options.timeoutMs ?? this.config.timeoutMs
+            provider.generate(req, {
+              timeoutMs: options.timeoutMs ?? this.config.timeoutMs,
+              attempt,
+              signal: controller.signal
+            }),
+            options.timeoutMs ?? this.config.timeoutMs,
+            {
+              onTimeout: () => {
+                controller.abort();
+              }
+            }
           );
         }, options);
 
@@ -339,13 +414,14 @@ export class OpenAIProvider {
     this.fetchImpl = fetchImpl;
   }
 
-  async generate(request) {
+  async generate(request, ctx = {}) {
     const response = await this.fetchImpl(`${this.baseUrl}/chat/completions`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
         authorization: `Bearer ${this.apiKey}`
       },
+      signal: ctx.signal,
       body: JSON.stringify({
         model: request.model,
         messages: request.messages,
@@ -371,13 +447,14 @@ export class OpenAIProvider {
     };
   }
 
-  async stream(request) {
+  async stream(request, ctx = {}) {
     const response = await this.fetchImpl(`${this.baseUrl}/chat/completions`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
         authorization: `Bearer ${this.apiKey}`
       },
+      signal: ctx.signal,
       body: JSON.stringify({
         model: request.model,
         messages: request.messages,

@@ -71,8 +71,8 @@ export type ProviderResult = {
 
 export interface ProviderAdapter {
   name: string;
-  generate(request: ProviderRequest, ctx: { timeoutMs?: number; attempt: number }): Promise<ProviderResult>;
-  stream?(request: ProviderRequest, ctx: { timeoutMs?: number; attempt: number }): Promise<AsyncIterable<string>>;
+  generate(request: ProviderRequest, ctx: { timeoutMs?: number; attempt: number; signal?: AbortSignal }): Promise<ProviderResult>;
+  stream?(request: ProviderRequest, ctx: { timeoutMs?: number; attempt: number; signal?: AbortSignal }): Promise<AsyncIterable<string>>;
 }
 
 export declare class LoraixRuntimeError extends Error {
