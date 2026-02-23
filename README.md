@@ -4,6 +4,7 @@ This repository contains multiple solutions and experiments.
 The reusable text plugin now lives in a dedicated standalone package folder:
 
 - `packages/ai-text-assistant/`
+- `packages/loraix-runtime-sdk/`
 
 ## AI Text Assistant package
 
@@ -24,3 +25,16 @@ cd packages/ai-text-assistant
 npm install
 npm test
 ```
+
+
+## LoraixRuntime SDK package
+
+Path: `packages/loraix-runtime-sdk`
+
+Package name: `loraix-runtime-sdk`
+
+What it includes:
+- provider-agnostic runtime core (LoraixRuntime)
+- OpenAI provider adapter
+- retry/fallback/json/stream abstractions
+- tests in `tests/`
