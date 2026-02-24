@@ -1,0 +1,39 @@
+{
+  "name": "aix-sdk",
+  "version": "0.1.0",
+  "description": "Unified AI SDK facade for Loraix runtime and providers.",
+  "type": "module",
+  "main": "src/index.js",
+  "module": "src/index.js",
+  "types": "src/index.d.ts",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "license": "MIT",
+  "peerDependencies": {
+    "loraix-runtime-core": "*",
+    "loraix-provider-openai": "*",
+    "loraix-provider-anthropic": "*",
+    "loraix-provider-deepseek": "*",
+    "loraix-provider-grok": "*",
+    "loraix-provider-bedrock": "*",
+    "loraix-provider-gemini": "*",
+    "loraix-provider-azure-openai": "*"
+  },
+  "peerDependenciesMeta": {
+    "loraix-provider-openai": { "optional": true },
+    "loraix-provider-anthropic": { "optional": true },
+    "loraix-provider-deepseek": { "optional": true },
+    "loraix-provider-grok": { "optional": true },
+    "loraix-provider-bedrock": { "optional": true },
+    "loraix-provider-gemini": { "optional": true },
+    "loraix-provider-azure-openai": { "optional": true }
+  }
+}
