@@ -4,6 +4,7 @@ This repository contains multiple solutions and experiments.
 Current publishable packages:
 
 - `packages/ai-text-assistant/`
+- `packages/aix-sdk/`
 - `packages/loraix-runtime-core/`
 - `packages/loraix-provider-openai/`
 - `packages/loraix-provider-anthropic/`
@@ -140,3 +141,14 @@ Package name: `loraix-provider-azure-openai`
 What it includes:
 - Azure OpenAI deployment-based provider adapter for `loraix-runtime-core`
 - chat completions + streaming text delta implementation
+
+
+## Aix SDK package
+
+Path: `packages/aix-sdk`
+
+Package name: `aix-sdk`
+
+What it includes:
+- Unified SDK facade over `loraix-runtime-core` + provider packages
+- Helper APIs to create provider instances and runtime clients
