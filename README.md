@@ -13,12 +13,6 @@ Current publishable packages:
 
 Docs deployment is automated by `.github/workflows/deploy-docs-pages.yml`.
 
-Detailed docs pages:
-- `docs/index.html` (portal)
-- `docs/guide.html` (setup)
-- `docs/packages.html` (all packages)
-- `docs/api.html` (runtime API reference)
-
 1. In GitHub repo settings, set **Pages** source to **GitHub Actions** (admin action; required once).
 2. Keep docs in `docs/` and push changes to `main` (or run workflow manually with `workflow_dispatch`).
 3. Workflow first checks Pages API availability; if unavailable, it exits cleanly with setup guidance instead of failing CI.

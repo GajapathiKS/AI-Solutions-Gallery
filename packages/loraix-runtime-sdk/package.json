@@ -1,0 +1,27 @@
+{
+  "name": "loraix-runtime-sdk",
+  "version": "0.1.1",
+  "description": "Provider-agnostic AI execution runtime with retry, fallback, JSON mode, and streaming.",
+  "type": "module",
+  "main": "src/index.js",
+  "module": "src/index.js",
+  "types": "src/index.d.ts",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": [
+    "ai",
+    "sdk",
+    "llm",
+    "runtime",
+    "openai"
+  ],
+  "license": "MIT"
+}
