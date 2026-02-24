@@ -138,28 +138,34 @@ function withStreamTimeout(iterable, timeoutMs, { onTimeout } = {}) {
   const iterator = iterable[Symbol.asyncIterator]();
   return {
     async *[Symbol.asyncIterator]() {
-      while (true) {
-        let timeoutId;
-        const nextValue = await Promise.race([
-          iterator.next(),
-          new Promise((_, reject) => {
-            timeoutId = setTimeout(() => {
-              const err = createTimeoutError(timeoutMs);
-              onTimeout?.(err, iterator);
-              reject(err);
-            }, timeoutMs);
-          })
-        ]).finally(() => {
-          if (timeoutId) {
-            clearTimeout(timeoutId);
+      try {
+        while (true) {
+          let timeoutId;
+          const nextValue = await Promise.race([
+            iterator.next(),
+            new Promise((_, reject) => {
+              timeoutId = setTimeout(() => {
+                const err = createTimeoutError(timeoutMs);
+                onTimeout?.(err, iterator);
+                reject(err);
+              }, timeoutMs);
+            })
+          ]).finally(() => {
+            if (timeoutId) {
+              clearTimeout(timeoutId);
+            }
+          });
+
+          if (nextValue.done) {
+            return;
           }
-        });
 
-        if (nextValue.done) {
-          return;
+          yield nextValue.value;
         }
-
-        yield nextValue.value;
+      } finally {
+        if (typeof iterator.return === 'function') {
+          await iterator.return();
+        }
       }
     }
   };

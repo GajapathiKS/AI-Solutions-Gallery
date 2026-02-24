@@ -12,6 +12,10 @@ export class AzureOpenAIProvider {
     if (!fetchImpl) throw new LoraixProviderError('AzureOpenAIProvider requires fetch implementation.');
     if (!deployment) throw new LoraixProviderError('AzureOpenAIProvider requires deployment.');
 
+    if (!baseUrl && !resourceName) {
+      throw new LoraixProviderError('AzureOpenAIProvider requires resourceName when baseUrl is not provided.');
+    }
+
     this.name = 'azure-openai';
     this.apiKey = apiKey;
     this.apiVersion = apiVersion;

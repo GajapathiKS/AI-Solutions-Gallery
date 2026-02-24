@@ -3,6 +3,14 @@ import assert from 'node:assert/strict';
 
 import { AzureOpenAIProvider } from '../src/index.js';
 
+
+test('AzureOpenAIProvider rejects missing resourceName when baseUrl is omitted', () => {
+  assert.throws(
+    () => new AzureOpenAIProvider({ apiKey: 'k', deployment: 'dep' }),
+    /requires resourceName when baseUrl is not provided/
+  );
+});
+
 test('AzureOpenAIProvider builds deployment endpoint and maps response', async () => {
   const provider = new AzureOpenAIProvider({
     apiKey: 'k',

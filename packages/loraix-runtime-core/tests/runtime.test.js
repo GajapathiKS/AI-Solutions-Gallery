@@ -261,3 +261,37 @@ test('stream timeout calls iterator.return for cleanup', async () => {
 
   assert.equal(returnCalled, true);
 });
+
+
+test('stream timeout wrapper closes iterator on consumer break', async () => {
+  let returnCalled = false;
+  const iterable = {
+    [Symbol.asyncIterator]() {
+      return {
+        async next() {
+          return { done: false, value: 'first' };
+        },
+        async return() {
+          returnCalled = true;
+          return { done: true, value: undefined };
+        }
+      };
+    }
+  };
+
+  const ai = new LoraixRuntime({
+    provider: fakeProvider({
+      onGenerate: async () => ({ text: '' }),
+      onStream: async () => iterable
+    }),
+    model: 'x',
+    maxRetries: 0
+  });
+
+  for await (const _chunk of ai.stream('cancel-early', { timeoutMs: 1000 })) {
+    break;
+  }
+
+  assert.equal(returnCalled, true);
+});
+
