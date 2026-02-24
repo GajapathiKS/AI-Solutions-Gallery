@@ -19,7 +19,7 @@ Docs deployment is automated by `.github/workflows/deploy-docs-pages.yml`.
 
 ## npm publish secret
 
-Publish workflows accept either `NPM_SECRET` (preferred) or `NPM_TOKEN`.
+Publish workflows use `NPM_TOKEN` for npm authentication.
 Set one repository secret with an npm publish-capable token (granular token with package write + 2FA bypass when required).
 
 ## 1.0.0 launch readiness checklist
@@ -27,7 +27,7 @@ Set one repository secret with an npm publish-capable token (granular token with
 Before tagging `1.0.0` across packages:
 - [ ] Bump each package version from `0.1.0` to `1.0.0`.
 - [ ] Create release notes/changelog entries per package.
-- [ ] Verify npm ownership + `NPM_SECRET` (or `NPM_TOKEN`) secret in GitHub Actions.
+- [ ] Verify npm ownership + `NPM_TOKEN` secret in GitHub Actions.
 - [ ] Dry-run tests in each package (`npm test`).
 - [ ] Push semver tags matching each workflow trigger (for example `loraix-provider-openai-v1.0.0`).
 

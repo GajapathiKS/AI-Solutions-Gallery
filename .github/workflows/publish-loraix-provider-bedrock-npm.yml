@@ -27,7 +27,7 @@ jobs:
       - name: Validate npm auth token
         run: npm whoami
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_SECRET || secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Install dependencies
         run: npm install
@@ -48,4 +48,4 @@ jobs:
       - name: Publish to npm
         run: npm publish --access public
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_SECRET || secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
