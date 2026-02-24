@@ -1,0 +1,23 @@
+{
+  "name": "loraix-provider-bedrock",
+  "version": "0.1.0",
+  "description": "Amazon Bedrock SDK provider adapter for Loraix runtime.",
+  "type": "module",
+  "main": "src/index.js",
+  "module": "src/index.js",
+  "types": "src/index.d.ts",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.863.0"
+  },
+  "license": "MIT"
+}
