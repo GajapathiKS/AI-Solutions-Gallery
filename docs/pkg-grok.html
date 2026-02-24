@@ -1,0 +1,15 @@
+<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>loraix-provider-grok docs</title><link rel="stylesheet" href="style.css"/></head><body>
+<nav><div class="nav-inner"><a class="logo" href="index.html">AI<span>Docs</span></a><div class="nav-links"><a href="index.html">Home</a><a href="guide.html">Guide</a><a class="active" href="packages.html">Packages</a><a href="api.html">API</a></div></div></nav>
+<main><span class="badge">Package</span><h1>loraix-provider-grok</h1><p>xAI Grok provider adapter</p>
+<h2>Install</h2><pre><code>npm install loraix-provider-grok</code></pre>
+<h2>Usage</h2><pre><code>import { GrokProvider } from 'loraix-provider-grok';
+const provider = new GrokProvider({ apiKey: process.env.XAI_API_KEY });</code></pre>
+<h2>Highlights</h2><ul><li>OpenAI-compatible transport</li>
+<li>SSE stream parsing</li>
+<li>provider error mapping</li></ul>
+<h2>Integrate with Runtime</h2><pre><code>import { LoraixRuntime } from 'loraix-runtime-core';
+const ai = new LoraixRuntime({ provider, model: 'gpt-4o-mini' });
+const out = await ai.generate('Hello');</code></pre>
+<p><a href="packages.html">← Back to package index</a></p>
+</main></body></html>

@@ -1,0 +1,15 @@
+<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>loraix-provider-azure-openai docs</title><link rel="stylesheet" href="style.css"/></head><body>
+<nav><div class="nav-inner"><a class="logo" href="index.html">AI<span>Docs</span></a><div class="nav-links"><a href="index.html">Home</a><a href="guide.html">Guide</a><a class="active" href="packages.html">Packages</a><a href="api.html">API</a></div></div></nav>
+<main><span class="badge">Package</span><h1>loraix-provider-azure-openai</h1><p>Azure OpenAI deployment provider</p>
+<h2>Install</h2><pre><code>npm install loraix-provider-azure-openai</code></pre>
+<h2>Usage</h2><pre><code>import { AzureOpenAIProvider } from 'loraix-provider-azure-openai';
+const provider = new AzureOpenAIProvider({ apiKey, resourceName, deployment });</code></pre>
+<h2>Highlights</h2><ul><li>deployment endpoint routing</li>
+<li>chat + stream support</li>
+<li>Azure-specific request shape</li></ul>
+<h2>Integrate with Runtime</h2><pre><code>import { LoraixRuntime } from 'loraix-runtime-core';
+const ai = new LoraixRuntime({ provider, model: 'gpt-4o-mini' });
+const out = await ai.generate('Hello');</code></pre>
+<p><a href="packages.html">← Back to package index</a></p>
+</main></body></html>

@@ -1,0 +1,23 @@
+<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Getting Started</title><link rel="stylesheet" href="style.css"/></head><body>
+<nav><div class="nav-inner"><a class="logo" href="index.html">AI<span>Docs</span></a><div class="nav-links"><a href="index.html">Home</a><a class="active" href="guide.html">Guide</a><a href="packages.html">Packages</a><a href="api.html">API</a></div></div></nav>
+<main><h1>Getting Started</h1>
+<h2>1) Install runtime + provider</h2>
+<pre><code>npm install loraix-runtime-core loraix-provider-openai</code></pre>
+<h2>2) Create runtime client</h2>
+<pre><code>import { LoraixRuntime } from 'loraix-runtime-core';
+import { OpenAIProvider } from 'loraix-provider-openai';
+
+const ai = new LoraixRuntime({
+  provider: new OpenAIProvider({ apiKey: process.env.OPENAI_API_KEY }),
+  model: 'gpt-4o-mini',
+  maxRetries: 2,
+  timeoutMs: 20000
+});</code></pre>
+<h2>3) Generate, JSON mode, and stream</h2>
+<pre><code>const text = await ai.generate('Explain recursion in 2 lines');
+const profile = await ai.json({ prompt: 'user profile', schema: { name: 'string', age: 'number' } });
+for await (const chunk of ai.stream('Write a haiku')) process.stdout.write(chunk);</code></pre>
+<h2>4) Choose another provider</h2>
+<p>Swap provider package only; runtime code remains stable. See <a href="packages.html">package docs</a>.</p>
+</main></body></html>

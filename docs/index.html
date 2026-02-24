@@ -1,45 +1,23 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Loraix / Aix SDK Docs</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 2rem; line-height: 1.45; color: #111827; }
-    h1, h2 { margin-bottom: .4rem; }
-    .muted { color: #6b7280; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap: .8rem; }
-    .card { border: 1px solid #e5e7eb; border-radius: 10px; padding: .8rem; }
-    code { background: #f3f4f6; padding: .12rem .3rem; border-radius: 4px; }
-  </style>
-</head>
-<body>
-  <h1>Loraix + Aix SDK Documentation</h1>
-  <p class="muted">Cross-package overview, launch checklist, and quick links.</p>
-
-  <h2>Packages</h2>
-  <div class="grid">
-    <div class="card"><strong>aix-sdk</strong><br/>Unified facade for provider + runtime composition.</div>
-    <div class="card"><strong>loraix-runtime-core</strong><br/>Provider-agnostic runtime with retries, timeouts, json mode, and streaming.</div>
-    <div class="card"><strong>loraix-provider-openai</strong></div>
-    <div class="card"><strong>loraix-provider-anthropic</strong></div>
-    <div class="card"><strong>loraix-provider-deepseek</strong></div>
-    <div class="card"><strong>loraix-provider-grok</strong></div>
-    <div class="card"><strong>loraix-provider-bedrock</strong> (AWS SDK + SigV4)</div>
-    <div class="card"><strong>loraix-provider-gemini</strong></div>
-    <div class="card"><strong>loraix-provider-azure-openai</strong> (deployment-based)</div>
-  </div>
-
-  <h2>1.0.0 Launch Checklist</h2>
-  <ul>
-    <li>Bump package versions from <code>0.1.0</code> to <code>1.0.0</code>.</li>
-    <li>Run <code>npm test</code> in each package.</li>
-    <li>Create semver tags matching workflow triggers.</li>
-    <li>Confirm <code>NPM_TOKEN</code> and npm ownership.</li>
-    <li>Publish changelog/release notes per package.</li>
-  </ul>
-
-  <h2>GitHub Pages</h2>
-  <p>Use the <code>Deploy Docs to GitHub Pages</code> workflow to publish this folder.</p>
-</body>
-</html>
+<!doctype html><html lang="en"><head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>AI-Solutions-Gallery Docs</title><link rel="stylesheet" href="style.css"/>
+</head><body>
+<nav><div class="nav-inner"><a class="logo" href="index.html">AI<span>Docs</span></a>
+<div class="nav-links"><a class="active" href="index.html">Home</a><a href="guide.html">Guide</a><a href="packages.html">Packages</a><a href="api.html">API</a></div></div></nav>
+<main>
+<section class="hero"><span class="badge">Documentation Portal</span><h1>AI Solutions Gallery — Detailed SDK Docs</h1>
+<p class="small">Complete package-by-package documentation for runtime core and providers, with installation, configuration, examples, and publishing references.</p></section>
+<div class="grid">
+  <div class="card"><h3>Quick Start</h3><p>Install runtime core + a provider and generate text in minutes.</p><p><a href="guide.html">Open setup guide →</a></p></div>
+  <div class="card"><h3>All Packages</h3><p>Detailed pages for core, aix-sdk facade, and each provider package.</p><p><a href="packages.html">Browse package docs →</a></p></div>
+  <div class="card"><h3>Unified API</h3><p>Understand `generate`, `json`, `stream`, retries, fallback, and provider contracts.</p><p><a href="api.html">Read API reference →</a></p></div>
+</div>
+<h2>Package Coverage</h2>
+<ul>
+<li><code>loraix-runtime-core</code></li><li><code>aix-sdk</code></li><li><code>loraix-provider-openai</code></li><li><code>loraix-provider-anthropic</code></li>
+<li><code>loraix-provider-bedrock</code></li><li><code>loraix-provider-azure-openai</code></li><li><code>loraix-provider-gemini</code></li><li><code>loraix-provider-deepseek</code></li><li><code>loraix-provider-grok</code></li>
+</ul>
+<h2>Release & Deployment Notes</h2>
+<ul><li>npm publish workflows use <code>NPM_TOKEN</code>.</li><li>GitHub Pages docs deploy uses <code>deploy-docs-pages.yml</code>.</li><li>If Pages is disabled, workflow prints setup guidance and skips deployment safely.</li></ul>
+<footer>Need package deep dives? Start from <a href="packages.html">Packages</a>.</footer>
+</main></body></html>
