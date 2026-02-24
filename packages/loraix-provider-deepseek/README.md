@@ -19,3 +19,7 @@ const ai = new LoraixRuntime({
   model: 'deepseek-chat'
 });
 ```
+
+## Docs
+
+See the repository docs portal for cross-package architecture and launch guidance: `../../docs/index.html`.

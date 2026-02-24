@@ -3,6 +3,34 @@
 This repository contains multiple solutions and experiments.  
 Current publishable packages:
 
+
+## Documentation portal
+
+- Recommended: publish `/docs` via GitHub Pages for discoverability and onboarding.
+- Suggested URL shape: `https://<org-or-user>.github.io/<repo>/`.
+
+## GitHub Pages deployment
+
+Docs deployment is automated by `.github/workflows/deploy-docs-pages.yml`.
+
+1. In GitHub repo settings, set **Pages** source to **GitHub Actions**.
+2. Keep docs in `docs/` and push changes to `main` (or run workflow manually with `workflow_dispatch`).
+3. Site will publish to `https://<org-or-user>.github.io/<repo>/`.
+
+## npm publish secret
+
+Publish workflows accept either `NPM_SECRET` (preferred) or `NPM_TOKEN`.
+Set one repository secret with an npm publish-capable token (granular token with package write + 2FA bypass when required).
+
+## 1.0.0 launch readiness checklist
+
+Before tagging `1.0.0` across packages:
+- [ ] Bump each package version from `0.1.0` to `1.0.0`.
+- [ ] Create release notes/changelog entries per package.
+- [ ] Verify npm ownership + `NPM_SECRET` (or `NPM_TOKEN`) secret in GitHub Actions.
+- [ ] Dry-run tests in each package (`npm test`).
+- [ ] Push semver tags matching each workflow trigger (for example `loraix-provider-openai-v1.0.0`).
+
 - `packages/ai-text-assistant/`
 - `packages/aix-sdk/`
 - `packages/loraix-runtime-core/`

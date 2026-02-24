@@ -29,3 +29,7 @@ const ai = new LoraixRuntime({
 - Authentication is AWS **SigV4** via the SDK (no API key).
 - Works with Bedrock model IDs and inference profile IDs through AWS SDK.
 - Supports basic text messages (`system`/`user`/`assistant`) and streaming text deltas.
+
+## Docs
+
+See the repository docs portal for cross-package architecture and launch guidance: `../../docs/index.html`.

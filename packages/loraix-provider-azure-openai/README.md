@@ -24,3 +24,7 @@ const ai = new LoraixRuntime({
   model: 'ignored-by-azure-deployment'
 });
 ```
+
+## Docs
+
+See the repository docs portal for cross-package architecture and launch guidance: `../../docs/index.html`.

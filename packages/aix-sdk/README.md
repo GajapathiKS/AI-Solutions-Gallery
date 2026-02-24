@@ -29,3 +29,7 @@ const response = await ai.generate({
   prompt: 'Say hello'
 });
 ```
+
+## Docs
+
+See the repository docs portal for cross-package architecture and launch guidance: `../../docs/index.html`.

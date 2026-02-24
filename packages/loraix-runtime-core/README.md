@@ -13,3 +13,7 @@ npm install loraix-runtime-core
 ```js
 import { LoraixRuntime } from 'loraix-runtime-core';
 ```
+
+## Docs
+
+See the repository docs portal for cross-package architecture and launch guidance: `../../docs/index.html`.

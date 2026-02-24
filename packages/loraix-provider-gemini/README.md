@@ -19,3 +19,7 @@ const ai = new LoraixRuntime({
   model: 'gemini-1.5-flash'
 });
 ```
+
+## Docs
+
+See the repository docs portal for cross-package architecture and launch guidance: `../../docs/index.html`.
