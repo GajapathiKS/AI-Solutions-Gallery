@@ -30,6 +30,20 @@ function toSystemPrompt(messages) {
     .join('\n');
 }
 
+function extractSseData(part) {
+  const lines = String(part ?? '').replace(/\r\n/g, '\n').split('\n');
+  const dataLines = lines
+    .map((line) => line.trim())
+    .filter((line) => line.startsWith('data:'))
+    .map((line) => line.slice(5).trim());
+
+  if (dataLines.length === 0) {
+    return '';
+  }
+
+  return dataLines.join('\n').trim();
+}
+
 export class AnthropicProvider {
   constructor({ apiKey, baseUrl = 'https://api.anthropic.com/v1', anthropicVersion = '2023-06-01', fetchImpl = globalThis.fetch }) {
     if (!apiKey) {
@@ -121,11 +135,7 @@ export class AnthropicProvider {
           buffer = parts.pop() ?? '';
 
           for (const part of parts) {
-            if (!part.startsWith('data:')) {
-              continue;
-            }
-
-            const payload = part.slice(5).trim();
+            const payload = extractSseData(part);
             if (!payload) {
               continue;
             }

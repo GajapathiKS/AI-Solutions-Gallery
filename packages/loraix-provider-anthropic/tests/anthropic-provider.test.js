@@ -34,8 +34,8 @@ test('AnthropicProvider throws for non-ok responses', async () => {
 test('AnthropicProvider stream parses text deltas', async () => {
   const encoder = new TextEncoder();
   const chunks = [
-    encoder.encode('data: {"type":"content_block_delta","delta":{"text":"Hel"}}\n\n'),
-    encoder.encode('data: {"type":"content_block_delta","delta":{"text":"lo"}}\n\n')
+    encoder.encode('event: content_block_delta\ndata: {"type":"content_block_delta","delta":{"text":"Hel"}}\n\n'),
+    encoder.encode('event: content_block_delta\ndata: {"type":"content_block_delta","delta":{"text":"lo"}}\n\n')
   ];
 
   const provider = new AnthropicProvider({

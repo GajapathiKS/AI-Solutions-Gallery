@@ -30,6 +30,11 @@ function toBedrockSystem(messages = []) {
   return [{ text: systemText }];
 }
 
+
+function getBedrockErrorStatus(error) {
+  return error?.$metadata?.httpStatusCode ?? error?.statusCode;
+}
+
 function normalizeOutputText(outputMessage) {
   if (!outputMessage?.content || !Array.isArray(outputMessage.content)) {
     return '';
@@ -84,7 +89,10 @@ export class BedrockProvider {
     try {
       data = await this.client.send(command, { abortSignal: ctx.signal });
     } catch (error) {
-      throw new LoraixProviderError(`Bedrock request failed: ${error?.message ?? 'Unknown error'}`, { raw: error });
+      throw new LoraixProviderError(`Bedrock request failed: ${error?.message ?? 'Unknown error'}`, {
+        status: getBedrockErrorStatus(error),
+        raw: error
+      });
     }
 
     return {
@@ -113,7 +121,10 @@ export class BedrockProvider {
     try {
       response = await this.client.send(command, { abortSignal: ctx.signal });
     } catch (error) {
-      throw new LoraixProviderError(`Bedrock stream request failed: ${error?.message ?? 'Unknown error'}`, { raw: error });
+      throw new LoraixProviderError(`Bedrock stream request failed: ${error?.message ?? 'Unknown error'}`, {
+        status: getBedrockErrorStatus(error),
+        raw: error
+      });
     }
 
     return {

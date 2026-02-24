@@ -80,3 +80,24 @@ test('BedrockProvider stream yields text deltas from ConverseStream events', asy
 
   assert.equal(text, 'Hello');
 });
+
+
+test('BedrockProvider preserves SDK http status code when wrapping errors', async () => {
+  const provider = new BedrockProvider({
+    bedrockClient: {
+      async send() {
+        const error = new Error('throttled');
+        error.$metadata = { httpStatusCode: 429 };
+        throw error;
+      }
+    }
+  });
+
+  await assert.rejects(
+    provider.generate({ model: 'm', messages: [] }),
+    (error) => {
+      assert.equal(error.status, 429);
+      return true;
+    }
+  );
+});
