@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loraix / Aix SDK Docs</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; line-height: 1.45; color: #111827; }
+    h1, h2 { margin-bottom: .4rem; }
+    .muted { color: #6b7280; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap: .8rem; }
+    .card { border: 1px solid #e5e7eb; border-radius: 10px; padding: .8rem; }
+    code { background: #f3f4f6; padding: .12rem .3rem; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Loraix + Aix SDK Documentation</h1>
+  <p class="muted">Cross-package overview, launch checklist, and quick links.</p>
+
+  <h2>Packages</h2>
+  <div class="grid">
+    <div class="card"><strong>aix-sdk</strong><br/>Unified facade for provider + runtime composition.</div>
+    <div class="card"><strong>loraix-runtime-core</strong><br/>Provider-agnostic runtime with retries, timeouts, json mode, and streaming.</div>
+    <div class="card"><strong>loraix-provider-openai</strong></div>
+    <div class="card"><strong>loraix-provider-anthropic</strong></div>
+    <div class="card"><strong>loraix-provider-deepseek</strong></div>
+    <div class="card"><strong>loraix-provider-grok</strong></div>
+    <div class="card"><strong>loraix-provider-bedrock</strong> (AWS SDK + SigV4)</div>
+    <div class="card"><strong>loraix-provider-gemini</strong></div>
+    <div class="card"><strong>loraix-provider-azure-openai</strong> (deployment-based)</div>
+  </div>
+
+  <h2>1.0.0 Launch Checklist</h2>
+  <ul>
+    <li>Bump package versions from <code>0.1.0</code> to <code>1.0.0</code>.</li>
+    <li>Run <code>npm test</code> in each package.</li>
+    <li>Create semver tags matching workflow triggers.</li>
+    <li>Confirm <code>NPM_TOKEN</code> and npm ownership.</li>
+    <li>Publish changelog/release notes per package.</li>
+  </ul>
+
+  <h2>GitHub Pages</h2>
+  <p>Use the <code>Deploy Docs to GitHub Pages</code> workflow to publish this folder.</p>
+</body>
+</html>
