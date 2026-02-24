@@ -1,0 +1,15 @@
+<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>loraix-provider-bedrock docs</title><link rel="stylesheet" href="style.css"/></head><body>
+<nav><div class="nav-inner"><a class="logo" href="index.html">AI<span>Docs</span></a><div class="nav-links"><a href="index.html">Home</a><a href="guide.html">Guide</a><a class="active" href="packages.html">Packages</a><a href="api.html">API</a></div></div></nav>
+<main><span class="badge">Package</span><h1>loraix-provider-bedrock</h1><p>AWS Bedrock SDK provider</p>
+<h2>Install</h2><pre><code>npm install loraix-provider-bedrock</code></pre>
+<h2>Usage</h2><pre><code>import { BedrockProvider } from 'loraix-provider-bedrock';
+const provider = new BedrockProvider({ region: 'us-east-1' });</code></pre>
+<h2>Highlights</h2><ul><li>Converse/ConverseStream APIs</li>
+<li>SigV4 auth via SDK credentials</li>
+<li>HTTP status propagation for retries</li></ul>
+<h2>Integrate with Runtime</h2><pre><code>import { LoraixRuntime } from 'loraix-runtime-core';
+const ai = new LoraixRuntime({ provider, model: 'gpt-4o-mini' });
+const out = await ai.generate('Hello');</code></pre>
+<p><a href="packages.html">← Back to package index</a></p>
+</main></body></html>

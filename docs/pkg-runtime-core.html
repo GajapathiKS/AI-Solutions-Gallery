@@ -1,0 +1,15 @@
+<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>loraix-runtime-core docs</title><link rel="stylesheet" href="style.css"/></head><body>
+<nav><div class="nav-inner"><a class="logo" href="index.html">AI<span>Docs</span></a><div class="nav-links"><a href="index.html">Home</a><a href="guide.html">Guide</a><a class="active" href="packages.html">Packages</a><a href="api.html">API</a></div></div></nav>
+<main><span class="badge">Package</span><h1>loraix-runtime-core</h1><p>Provider-agnostic runtime engine</p>
+<h2>Install</h2><pre><code>npm install loraix-runtime-core</code></pre>
+<h2>Usage</h2><pre><code>import { LoraixRuntime } from 'loraix-runtime-core';
+const ai = new LoraixRuntime({ provider, model: 'gpt-4o-mini' });</code></pre>
+<h2>Highlights</h2><ul><li>generate/json/stream APIs</li>
+<li>retry + fallback orchestration</li>
+<li>request/attempt/response interceptors</li></ul>
+<h2>Integrate with Runtime</h2><pre><code>import { LoraixRuntime } from 'loraix-runtime-core';
+const ai = new LoraixRuntime({ provider, model: 'gpt-4o-mini' });
+const out = await ai.generate('Hello');</code></pre>
+<p><a href="packages.html">← Back to package index</a></p>
+</main></body></html>

@@ -1,0 +1,22 @@
+<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>API Reference</title><link rel="stylesheet" href="style.css"/></head><body>
+<nav><div class="nav-inner"><a class="logo" href="index.html">AI<span>Docs</span></a><div class="nav-links"><a href="index.html">Home</a><a href="guide.html">Guide</a><a href="packages.html">Packages</a><a class="active" href="api.html">API</a></div></div></nav>
+<main><h1>Runtime API Reference</h1>
+<h2>Core Methods</h2>
+<table class="table"><tr><th>Method</th><th>Description</th></tr>
+<tr><td><code>generate(input, options?)</code></td><td>Generate text from prompt or messages.</td></tr>
+<tr><td><code>json({ prompt, schema, ... })</code></td><td>Strict JSON generation with shallow schema validation and one repair retry.</td></tr>
+<tr><td><code>stream(input, options?)</code></td><td>Async iterable chunks; timeout/retry protection around setup and stream handling.</td></tr>
+</table>
+<h2>Config</h2>
+<pre><code>{
+  provider, model,
+  temperature?, maxTokens?, timeoutMs?,
+  maxRetries?, retryStrategy?, fallbackProviders?
+}</code></pre>
+<h2>Retry Rules</h2>
+<ul><li>Retryable: 429, 500, 503, timeout, network failures.</li><li>Non-retryable: 400/auth/json-schema validation failures.</li><li>Fallback providers are used only after retry exhaustion.</li></ul>
+<h2>Provider Contract</h2>
+<pre><code>provider.generate(request, ctx) => { text, usage?, raw }
+provider.stream(request, ctx) => AsyncIterable&lt;string&gt;</code></pre>
+</main></body></html>
