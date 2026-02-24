@@ -13,9 +13,10 @@ Current publishable packages:
 
 Docs deployment is automated by `.github/workflows/deploy-docs-pages.yml`.
 
-1. In GitHub repo settings, set **Pages** source to **GitHub Actions**.
+1. In GitHub repo settings, set **Pages** source to **GitHub Actions** (admin action; required once).
 2. Keep docs in `docs/` and push changes to `main` (or run workflow manually with `workflow_dispatch`).
-3. Site will publish to `https://<org-or-user>.github.io/<repo>/`.
+3. Workflow first checks Pages API availability; if unavailable, it exits cleanly with setup guidance instead of failing CI.
+4. Site will publish to `https://<org-or-user>.github.io/<repo>/`.
 
 ## npm publish secret
 
